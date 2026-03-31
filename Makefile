@@ -1,4 +1,4 @@
-CC := clang
+CC := cc
 CFLAGS := -fPIE -Wall -Wextra -Werror -g
 INCLUDES := -Iincludes -Ilib/libft -I./lib/minilibx-linux
 SRC_DIR := src
@@ -8,6 +8,9 @@ LIBFT := $(LIBFT_DIR)/libft.a
 
 SRCS := \
 	$(SRC_DIR)/main.c \
+	$(SRC_DIR)/pixel.c \
+	$(SRC_DIR)/sphere.c \
+	$(SRC_DIR)/vec3.c
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)

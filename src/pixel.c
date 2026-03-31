@@ -5,7 +5,7 @@
 #include "../includes/color.h"
 #include "../includes/mlx_mitm.h"
 
-void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
+static void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
     char	*dst;
 

@@ -8,13 +8,4 @@
 #include "vec3.h"
 #include "obj.h"
 
-typedef struct intersection
-{
-    double  distance_squared;
-    t_vec3  point;
-    t_vec3  surface_normal;
-    t_obj   *object;
-    void    *context;
-} intersection;
-
 #endif //MINIRT_INTERSECTION_H

@@ -4,6 +4,7 @@
 
 #ifndef MINIRT_OBJ_H
 #define MINIRT_OBJ_H
+#include "ray.h"
 #include "vec3.h"
 
 typedef enum
@@ -15,5 +16,15 @@ typedef struct s_obj
 {
     t_obj_type  type;
     t_vec3      pos;
+    union
+    {
+        struct
+        {
+            double radius;
+        } sphere;
+    } data;
+    // t_material
 } t_obj;
+
+double hit_sphere(t_obj *sphere, t_ray *ray);
 #endif //MINIRT_OBJ_H
