@@ -16,7 +16,7 @@ int ray_color(t_ray *ray, t_obj *world)
     t_color color;
     tzao = hit_sphere(world, ray);
     if (tzao != -1.0)
-        return (0 * printf("oi migo\n") + 0x0000FF00);
+        return (0x00FF0000);
 
     // Sky gradient: white to blue
     t_vec3 white = vec3(1.0, 1.0, 1.0);
@@ -66,13 +66,14 @@ int	main(void)
 
     for (int y = 0; y < img.height; y++)
     {
-        cy = wall_width/2 + (wall_width*y/1080);
+        cy = wall_width / 2.0 - (wall_width * (double)y / (double)img.height);
         for (int x = 0; x < img.width; x++)
         {
-            cx = -(wall_width/2) + (wall_width*x/1080);
-            t_vec3 dir = vec3(cx, cy, wall_z);
+            cx = -(wall_width / 2.0) + (wall_width * (double)x / (double)img.width);
+            t_vec3 wall_point = vec3(cx, cy, wall_z);
             t_ray ray;
             ray.origin = light_source;
+            t_vec3 dir = vec3_subtract(&wall_point, &ray.origin);
             ray.direction = vec3_multiply_scalar(&dir, 1.0 / vec3_length(&dir));
             my_mlx_pixel_put(&img, x, y, ray_color(&ray, &sph));
         }
