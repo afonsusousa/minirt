@@ -8,7 +8,7 @@
 
 int ray_color(t_ray *ray, t_obj *world)
 {
-    t_vec3 unit_direction = vec3_unit_vector(&ray->direction);
+    t_vec3 unit_direction = v3_unit(&ray->direction);
     double a = 0.5 * (unit_direction.e[1] + 1.0);
     double tzao;
 
@@ -22,9 +22,9 @@ int ray_color(t_ray *ray, t_obj *world)
     t_vec3 white = vec3(1.0, 1.0, 1.0);
     t_vec3 blue = vec3(0.5, 0.7, 1.0);
 
-    t_vec3 white_scaled = vec3_multiply_scalar(&white, 1.0 - a);
-    t_vec3 blue_scaled = vec3_multiply_scalar(&blue, a);
-    t_vec3 color_vec = vec3_sum(&white_scaled, &blue_scaled);
+    t_vec3 white_scaled = v3_muls(&white, 1.0 - a);
+    t_vec3 blue_scaled = v3_muls(&blue, a);
+    t_vec3 color_vec = v3_add(&white_scaled, &blue_scaled);
 
     color.s_rgba.r = (unsigned char)(255.999 * color_vec.e[0]);
     color.s_rgba.g = (unsigned char)(255.999 * color_vec.e[1]);
@@ -73,8 +73,8 @@ int	main(void)
             t_vec3 wall_point = vec3(cx, cy, wall_z);
             t_ray ray;
             ray.origin = light_source;
-            t_vec3 dir = vec3_subtract(&wall_point, &ray.origin);
-            ray.direction = vec3_multiply_scalar(&dir, 1.0 / vec3_length(&dir));
+            t_vec3 dir = v3_sub(&wall_point, &ray.origin);
+            ray.direction = v3_muls(&dir, 1.0 / v3_len(&dir));
             my_mlx_pixel_put(&img, x, y, ray_color(&ray, &sph));
         }
     }

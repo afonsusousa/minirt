@@ -17,7 +17,7 @@ static inline t_vec3 ray_at(t_ray *ray, double t)
 {
     t_vec3  mult;
 
-    mult = vec3_multiply_scalar(&ray->direction, t);
-    return (vec3_sum(&ray->origin, &mult));
+    mult = v3_muls(&ray->direction, t);
+    return (v3_add(&ray->origin, &mult));
 }
 #endif //MINIRT_RAY_H
