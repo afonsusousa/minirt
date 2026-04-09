@@ -45,7 +45,7 @@ int	main(void)
     t_data	img;
     t_camera	cam;
 
-    init_camera(&cam, 400, 16.0 / 9.0);
+    init_camera(&cam, 1080, 16.0 / 9.0);
     img.width = cam.image_width;
     img.height = cam.image_height;
     
