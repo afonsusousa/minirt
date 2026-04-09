@@ -12,7 +12,7 @@ static void     set_viewport_origin(t_camera *cam)
 {
         cam->viewport_upper_left = v3_sub(
                 v3_sub(
-                        v3_sub(cam->camera_center, vec3(0, 0, cam->focal_length)),
+                        v3_add(cam->camera_center, vec3(0, 0, cam->focal_length)),
                         v3_divs(cam->viewport_u, 2.0)
                 ),
                 v3_divs(cam->viewport_v, 2.0)

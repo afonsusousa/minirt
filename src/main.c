@@ -16,7 +16,7 @@ t_color ray_color(t_ray *ray, t_obj *world)
     tzao = hit_sphere(world, ray);
     if (tzao >= 0)
     {
-        t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), vec3(0, 0, -1)));
+        t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), vec3(0, 0, 1)));
         return (v3_muls(
             vec3(N.at[0] + 1.0, N.at[1] + 1.0, N.at[2] + 1.0),
             0.5
@@ -56,7 +56,7 @@ int	main(void)
                                 &img.endian);
 
     t_obj sph;
-    sph.pos = vec3(0,0,-1); // moved back slightly to be visible
+    sph.pos = vec3(0,0,1); // moved forward slightly to be visible
     sph.data.sphere.radius = 0.5;
 
     for (int y = 0; y < img.height; y++)
