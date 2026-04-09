@@ -4,34 +4,30 @@
 #include "../includes/vec3.h"
 #include "../includes/ray.h"
 #include "../includes/obj.h"
+#include "../includes/camera.h"
 #include <stdio.h>
 
-int ray_color(t_ray *ray, t_obj *world)
+t_color ray_color(t_ray *ray, t_obj *world)
 {
-    t_vec3 unit_direction = v3_unit(&ray->direction);
-    double a = 0.5 * (unit_direction.e[1] + 1.0);
+    t_vec3 unit_direction = v3_unit(ray->direction);
+    double a = 0.5 * (unit_direction.at[1] + 1.0);
     double tzao;
 
-    //atencao ao Tzao negativo
-    t_color color;
     tzao = hit_sphere(world, ray);
-    if (tzao != -1.0)
-        return (0x00FF0000);
+    if (tzao >= 0)
+    {
+        t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), vec3(0, 0, -1)));
+        return (v3_muls(
+            vec3(N.at[0] + 1.0, N.at[1] + 1.0, N.at[2] + 1.0),
+            0.5
+        ));
+    }
 
     // Sky gradient: white to blue
-    t_vec3 white = vec3(1.0, 1.0, 1.0);
-    t_vec3 blue = vec3(0.5, 0.7, 1.0);
-
-    t_vec3 white_scaled = v3_muls(&white, 1.0 - a);
-    t_vec3 blue_scaled = v3_muls(&blue, a);
-    t_vec3 color_vec = v3_add(&white_scaled, &blue_scaled);
-
-    color.s_rgba.r = (unsigned char)(255.999 * color_vec.e[0]);
-    color.s_rgba.g = (unsigned char)(255.999 * color_vec.e[1]);
-    color.s_rgba.b = (unsigned char)(255.999 * color_vec.e[2]);
-    color.s_rgba.a = 255;
-
-    return (color.hex);
+    return (v3_add(
+        v3_muls(vec3(1.0, 1.0, 1.0), 1.0 - a),
+        v3_muls(vec3(0.5, 0.7, 1.0), a)
+    ));
 }
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
@@ -47,35 +43,40 @@ int	main(void)
     void	*mlx;
     void	*mlx_win;
     t_data	img;
+    t_camera	cam;
 
-    img.height = 1080;
-    img.width = 1080;
+    init_camera(&cam, 400, 16.0 / 9.0);
+    img.width = cam.image_width;
+    img.height = cam.image_height;
+    
     mlx = mlx_init();
     mlx_win = mlx_new_window(mlx, img.width, img.height, "Hello world!");
     img.img = mlx_new_image(mlx, img.width, img.height);
     img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
                                 &img.endian);
-    double wall_width = 7;
-    t_vec3 light_source = vec3(0, 0, -5);
-    double wall_z = 10;
-    double cx;
-    double cy;
+
     t_obj sph;
-    sph.pos = vec3(0,0,0);
-    sph.data.sphere.radius = 1;
+    sph.pos = vec3(0,0,-1); // moved back slightly to be visible
+    sph.data.sphere.radius = 0.5;
 
     for (int y = 0; y < img.height; y++)
     {
-        cy = wall_width / 2.0 - (wall_width * (double)y / (double)img.height);
         for (int x = 0; x < img.width; x++)
         {
-            cx = -(wall_width / 2.0) + (wall_width * (double)x / (double)img.width);
-            t_vec3 wall_point = vec3(cx, cy, wall_z);
             t_ray ray;
-            ray.origin = light_source;
-            t_vec3 dir = v3_sub(&wall_point, &ray.origin);
-            ray.direction = v3_muls(&dir, 1.0 / v3_len(&dir));
-            my_mlx_pixel_put(&img, x, y, ray_color(&ray, &sph));
+            ray.origin = cam.camera_center;
+            ray.direction = v3_sub(
+                v3_add(
+                    cam.pixel00_loc,
+                    v3_add(
+                        v3_muls(cam.pixel_delta_u, x),
+                        v3_muls(cam.pixel_delta_v, y)
+                    )
+                ),
+                cam.camera_center
+            );
+            
+            my_mlx_pixel_put(&img, x, y, color_to_int(ray_color(&ray, &sph)));
         }
     }
 
