@@ -11,6 +11,7 @@ SRCS := \
 	$(SRC_DIR)/pixel.c \
 	$(SRC_DIR)/sphere.c \
 	$(SRC_DIR)/vec3.c \
+	$(SRC_DIR)/parsing.c \
 	$(SRC_DIR)/camera.c
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))

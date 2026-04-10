@@ -6,6 +6,7 @@
 #include "../includes/obj.h"
 #include "../includes/camera.h"
 #include "../includes/intersection.h"
+#include "../includes/world.h"
 #include <stdio.h>
 
 t_color ray_color(t_ray *ray, t_obj *world, size_t bounce)
@@ -55,9 +56,9 @@ int	main(void)
     img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
                                 &img.endian);
 
-    t_obj sph;
-    sph.pos = vec3(0,0,1); // moved forward slightly to be visible
-    sph.data.sphere.radius = 0.5;
+    t_world w;
+    parse_file(&w, "exemplo.3d");
+    t_obj sph = w.map[0];
 
     for (int y = 0; y < img.height; y++)
     {

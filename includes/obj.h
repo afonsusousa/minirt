@@ -6,10 +6,13 @@
 #define MINIRT_OBJ_H
 #include "ray.h"
 #include "vec3.h"
+#include "stdbool.h"
+#include "stddef.h"
 
 typedef enum
 {
-    OBJ_SPHERE = 1
+    OBJ_SPHERE = 1,
+    ERR
 } t_obj_type;
 
 typedef struct s_obj
@@ -24,6 +27,13 @@ typedef struct s_obj
         } sphere;
     } data;
     // t_material
+    t_vec3  color;
 } t_obj;
 
-#endif //MINIRT_OBJ_H
+typedef struct s_world
+{
+    t_obj   *map;
+    size_t  size;
+} t_world;
+
+#endif //MINIRT_OBJ_H#include "stdbool.h"
