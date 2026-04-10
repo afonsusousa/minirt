@@ -5,6 +5,7 @@
 #include "../includes/ray.h"
 #include "../includes/obj.h"
 #include "../includes/camera.h"
+#include "../includes/intersection.h"
 #include <stdio.h>
 
 t_color ray_color(t_ray *ray, t_obj *world)

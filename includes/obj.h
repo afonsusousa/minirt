@@ -26,5 +26,4 @@ typedef struct s_obj
     // t_material
 } t_obj;
 
-double hit_sphere(t_obj *sphere, t_ray *ray);
 #endif //MINIRT_OBJ_H
