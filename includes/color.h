@@ -14,9 +14,9 @@ static inline unsigned int color_to_int(t_color c)
 {
     return create_trgb(
         0,
-        (unsigned char)(255.999 * c.at[0]),
-        (unsigned char)(255.999 * c.at[1]),
-        (unsigned char)(255.999 * c.at[2])
+        (unsigned char)(255.999 * c.x),
+        (unsigned char)(255.999 * c.y),
+        (unsigned char)(255.999 * c.z)
     );
 }
 

@@ -10,15 +10,15 @@
 t_color ray_color(t_ray *ray, t_obj *world)
 {
     t_vec3 unit_direction = v3_unit(ray->direction);
-    double a = 0.5 * (unit_direction.at[1] + 1.0);
+    double a = 0.5 * (unit_direction.y + 1.0);
     double tzao;
 
     tzao = hit_sphere(world, ray);
     if (tzao >= 0)
     {
-        t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), vec3(0, 0, 1)));
+        t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), world->pos));
         return (v3_muls(
-            vec3(N.at[0] + 1.0, N.at[1] + 1.0, N.at[2] + 1.0),
+            vec3(N.x + 1.0, N.y + 1.0, N.z + 1.0),
             0.5
         ));
     }
