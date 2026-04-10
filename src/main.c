@@ -8,18 +8,17 @@
 #include "../includes/intersection.h"
 #include <stdio.h>
 
-t_color ray_color(t_ray *ray, t_obj *world)
+t_color ray_color(t_ray *ray, t_obj *world, size_t bounce)
 {
     t_vec3 unit_direction = v3_unit(ray->direction);
     double a = 0.5 * (unit_direction.y + 1.0);
-    double tzao;
+    t_hit record;
+    (void)bounce;
 
-    tzao = hit_sphere(world, ray);
-    if (tzao >= 0)
+    if (hit_sphere(world, ray, &record))
     {
-        t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), world->pos));
         return (v3_muls(
-            vec3(N.x + 1.0, N.y + 1.0, N.z + 1.0),
+            vec3(record.N.x + 1.0, record.N.y + 1.0, record.N.z + 1.0),
             0.5
         ));
     }
@@ -77,7 +76,7 @@ int	main(void)
                 cam.camera_center
             );
             
-            my_mlx_pixel_put(&img, x, y, color_to_int(ray_color(&ray, &sph)));
+            my_mlx_pixel_put(&img, x, y, color_to_int(ray_color(&ray, &sph, 1)));
         }
     }
 

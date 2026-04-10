@@ -3,13 +3,20 @@
 //
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "../includes/obj.h"
 #include "../includes/ray.h"
 #include "../includes/vec3.h"
 #include "../includes/intersection.h"
 
-double hit_sphere(t_obj *sphere, t_ray *ray)
+/*
+ t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), world->pos));
+        return (v3_muls(
+            vec3(N.x + 1.0, N.y + 1.0, N.z + 1.0),
+            0.5
+*/
+bool hit_sphere(t_obj *sphere, t_ray *ray, t_hit *record)
 {
     t_vec3	oc;
     double  a;
@@ -23,6 +30,9 @@ double hit_sphere(t_obj *sphere, t_ray *ray)
     c = v3_dot(oc, oc) - sphere->data.sphere.radius * sphere->data.sphere.radius;
     d = h * h - a*c;
     if (d < 0)
-        return (-1.0);
-    return ((h - sqrt(d)) / a);
+        return (false);
+    record->t = (h - sqrt(d) / a);
+    record->p = ray_at(ray, record->t);
+    record->N = v3_unit(v3_sub(record->p, sphere->pos));
+    return (true);
 }

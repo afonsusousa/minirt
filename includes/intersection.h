@@ -7,12 +7,13 @@
 
 #include "vec3.h"
 #include "obj.h"
+#include <stdbool.h>
 
 typedef struct s_hit{
     t_vec3 p;
     double_t t;
-    t_vec3 normal;
+    t_vec3 N;
 }t_hit;
 
-double hit_sphere(t_obj *sphere, t_ray *ray);
+bool hit_sphere(t_obj *sphere, t_ray *ray, t_hit *record);
 #endif //MINIRT_INTERSECTION_H
