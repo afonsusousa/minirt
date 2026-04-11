@@ -1,4 +1,4 @@
-#include "libft.h"
+#include "../lib/libft/libft.h"
 #include "unistd.h"
 #include "fcntl.h"
 #include <math.h>
@@ -85,7 +85,6 @@ static size_t  magnitude(int n)
     return (mag);
 }
 
-// o wallace nao gosta de dois pontos..
 
 double  ft_atod(const char *nbr)
 {
@@ -94,6 +93,7 @@ double  ft_atod(const char *nbr)
 
     integer = ft_atoi(nbr);
     nbr += magnitude(integer) + 1;
+    // o wallace tem medo de dois pontos..
     while (*nbr && !ft_isdigit(*nbr))
         nbr++;
     decimal = ft_atoi(nbr);
@@ -155,10 +155,14 @@ t_world *parse_file(t_world *wrld, char *path)
 
     wrld->size = 0;
     fd = open(path, O_RDONLY);
+    if (fd < 0)
+        return (NULL);
     while (get_next_line(fd))
         wrld->size++;
     close(fd);
     fd = open(path, O_RDONLY);
+    if (fd < 0)
+        return (NULL);
     wrld->map = ft_calloc(wrld->size, sizeof(t_obj));
     i = 0;
     while (i < wrld->size)

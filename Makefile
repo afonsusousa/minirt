@@ -29,7 +29,7 @@ CFLAGS += -MMD -MP
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS) $(MLX)
-	$(CC) $(CFLAGS) $(MLXFLAGS) -o $@ $(OBJS) $(LDFLAGS) $(LDLIBS) $(MLX)
+	$(CC) $(CFLAGS) $(MLXFLAGS) -o $@ $(OBJS) $(LDFLAGS) -lft $(LDLIBS) $(MLX)
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
