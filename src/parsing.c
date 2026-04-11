@@ -48,8 +48,6 @@ char *get_next_line(int fd)
     return (line);
 }
 
-
-
 static size_t  magnitude(int n)
 {
     size_t mag;
@@ -64,10 +62,6 @@ static size_t  magnitude(int n)
     }
     return (mag);
 }
-
-
-
-
 
 bool    ft_isspace(char c)
 {
@@ -160,7 +154,7 @@ bool    parse_vec3_double(char **line, t_vec3   *vec)
     return (true);
 }
 
-bool    parse_sphere_s(char **line, t_obj *obj)
+bool    parse_sphere(char **line, t_obj *obj)
 {
     *line += 2;
     if (!skip(line, ft_isspace))
@@ -179,7 +173,7 @@ bool    parse_sphere_s(char **line, t_obj *obj)
     return (true);
 }
 
-bool    parse_line_s(char **line, t_obj *obj)
+bool    parse_line(char **line, t_obj *obj)
 {
     skip(line, ft_isspace);
     if (**line == '\0' || **line == '\n')
@@ -188,7 +182,7 @@ bool    parse_line_s(char **line, t_obj *obj)
         return (true);
     }
     if (ft_strncmp(*line, "sp", 2) == 0)
-        return (parse_sphere_s(line, obj));
+        return (parse_sphere(line, obj));
     return (false);
 }
 
@@ -244,7 +238,7 @@ t_world *parse_file(t_world *wrld, char *path)
     {
         line = get_next_line(fd);
         current = line;
-        if (!parse_line_s(&current, &obj))
+        if (!parse_line(&current, &obj))
         {
             syntax_error(path, i + 1, line, current);
             free(line);
