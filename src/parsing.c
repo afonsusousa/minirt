@@ -154,7 +154,86 @@ bool    parse_vec3_double(char **line, t_vec3   *vec)
     return (true);
 }
 
+//  A 0.2 255,255,255
+bool    parse_ambient(char **line, t_obj *obj)
+{
+    (*line)++;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_double(line, &obj->ratio))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_uchar(line, &obj->color))
+        return (false);
+    obj->type = OBJ_AMBIENT;
+    return (true);
+}
+
+//C -50.0,0,20 0,0,1 70
+bool    parse_camera(char **line, t_obj *obj)
+{
+    (*line)++;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_double(line, &obj->pos))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_double(line, &obj->dir))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_double(line, &obj->fov))
+        return (false);
+    obj->type = OBJ_CAMERA;
+    return (true);
+}
+
+// L -40.0,50.0,0.0 0.6 10,0,255
+bool    parse_light(char **line, t_obj *obj)
+{
+    (*line)++;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_double(line, &obj->pos))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_double(line, &obj->ratio))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_uchar(line, &obj->color))
+        return (false);
+    obj->type = OBJ_LIGHT;
+    return (true);
+}
+
 bool    parse_sphere(char **line, t_obj *obj)
+{
+    double diameter;
+
+    *line += 2;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_double(line, &obj->pos))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_double(line, &diameter))
+        return (false);
+    obj->radius = diameter / 2.0;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_uchar(line, &obj->color))
+        return (false);
+    obj->type = OBJ_SPHERE;
+    return (true);
+}
+
+// pl 0.0,0.0,-10.0 0.0,1.0,0.0 0,0,225
+bool    parse_plane(char **line, t_obj *obj)
 {
     *line += 2;
     if (!skip(line, ft_isspace))
@@ -163,13 +242,44 @@ bool    parse_sphere(char **line, t_obj *obj)
         return (false);
     if (!skip(line, ft_isspace))
         return (false);
-    if (!parse_double(line, &obj->data.sphere.radius))
+    if (!parse_vec3_double(line, &obj->dir))
         return (false);
     if (!skip(line, ft_isspace))
         return (false);
     if (!parse_vec3_uchar(line, &obj->color))
         return (false);
-    obj->type = OBJ_SPHERE;
+    obj->type = OBJ_PLANE;
+    return (true);
+}
+
+// cy 50.0,0.0,20.6 0.0,0.0,1.0 14.2 21.42 10,0,255
+bool    parse_cylinder(char **line, t_obj *obj)
+{
+    double diameter;
+
+    *line += 2;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_double(line, &obj->pos))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_double(line, &obj->dir))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_double(line, &diameter))
+        return (false);
+    obj->radius = diameter / 2.0;
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_double(line, &obj->height))
+        return (false);
+    if (!skip(line, ft_isspace))
+        return (false);
+    if (!parse_vec3_uchar(line, &obj->color))
+        return (false);
+    obj->type = OBJ_CYLINDER;
     return (true);
 }
 
@@ -183,6 +293,16 @@ bool    parse_line(char **line, t_obj *obj)
     }
     if (ft_strncmp(*line, "sp", 2) == 0)
         return (parse_sphere(line, obj));
+    if (ft_strncmp(*line, "pl", 2) == 0)
+        return (parse_plane(line, obj));
+    if (ft_strncmp(*line, "cy", 2) == 0)
+        return (parse_cylinder(line, obj));
+    if (ft_strncmp(*line, "A", 1) == 0)
+        return (parse_ambient(line, obj));
+    if (ft_strncmp(*line, "C", 1) == 0)
+        return (parse_camera(line, obj));
+    if (ft_strncmp(*line, "L", 1) == 0)
+        return (parse_light(line, obj));
     return (false);
 }
 

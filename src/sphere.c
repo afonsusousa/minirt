@@ -27,7 +27,7 @@ bool hit_sphere(t_obj *sphere, t_ray *ray, t_hit *record)
     oc = v3_sub(sphere->pos, ray->origin);
     a = v3_dot(ray->direction, ray->direction);
     h = v3_dot(ray->direction, oc);
-    c = v3_dot(oc, oc) - sphere->data.sphere.radius * sphere->data.sphere.radius;
+    c = v3_dot(oc, oc) - sphere->radius * sphere->radius;
     d = h * h - a*c;
     if (d < 0)
         return (false);
