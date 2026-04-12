@@ -1,86 +1,11 @@
-#include "../lib/libft/libft.h"
+#include "../../lib/libft/libft.h"
 #include "unistd.h"
 #include "fcntl.h"
 #include <math.h>
-#include "obj.h"
+#include "../../includes/obj.h"
+#include "parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
-
-#define BUFFER_SIZE 256
-
-char *get_next_line(int fd)
-{
-    static char buffer[BUFFER_SIZE];
-    static int buffer_pos;
-    static int buffer_read;
-    char *line;
-    int i = 0;
-
-    if (fd < 0 || BUFFER_SIZE <= 0)
-        return (NULL);
-
-    line = malloc(70000);
-    if (!line)
-        return (NULL);
-
-    while (1)
-    {
-        if (buffer_pos >= buffer_read)
-        {
-            buffer_read = read(fd, buffer, BUFFER_SIZE);
-            buffer_pos = 0;
-            if (buffer_read <= 0)
-                break;
-        }
-        line[i++] = buffer[buffer_pos++];
-        if (line[i - 1] == '\n')
-            break;
-    }
-
-    line[i] = '\0';
-
-    if (i == 0)
-    {
-        free(line);
-        return (NULL);
-    }
-
-    return (line);
-}
-
-static size_t  magnitude(int n)
-{
-    size_t mag;
-
-    if (!n)
-        return (1);
-    mag = 0;
-    while (n != 0)
-    {
-        mag++;
-        n /= 10;
-    }
-    return (mag);
-}
-
-bool    ft_isspace(char c)
-{
-    return (c == ' ' || (c >= 9 && c <= 13));
-}
-
-
-bool    skip(char **s, bool (*predicate)(char))
-{
-    bool ret;
-
-    ret = false;
-    while (**s && predicate(**s))
-    {
-        (*s)++;
-        ret = true;
-    }
-    return (ret);
-}
 
 bool  parse_double(char **line, double *d)
 {
@@ -180,18 +105,6 @@ bool    parse_format(char **line, t_obj *obj, int flags)
     return (true);
 }
 
-bool    match_id(char **line, char *id)
-{
-    int len;
-
-    len = ft_strlen(id);
-    if (ft_strncmp(*line, id, len) == 0)
-    {
-        *line += len;
-        return (true);
-    }
-    return (false);
-}
 
 static bool parse_type(t_obj *obj, t_obj_type type, char **line, int flags)
 {
@@ -220,30 +133,6 @@ bool    parse_line(char **line, t_obj *obj)
     if (match_id(line, "L"))
         return (parse_type(obj, OBJ_LIGHT, line, F_FMT_LIGHT));
     return (false);
-}
-
-void    syntax_error(const char *file, int line, const char *start, const char *current)
-{
-    int offset;
-    int i;
-    int len;
-
-    offset = current - start;
-    printf("%s:%d:%d: error: syntax error\n", file, line, offset + 1);
-    printf("%s", start);
-    len = ft_strlen(start);
-    if (len == 0 || start[len - 1] != '\n')
-        printf("\n");
-    i = 0;
-    while (i < offset)
-    {
-        if (start[i] == '\t')
-            printf("\t");
-        else
-            printf(" ");
-        i++;
-    }
-    printf("^\n");
 }
 
 //maybe detect errors here, also error handling
