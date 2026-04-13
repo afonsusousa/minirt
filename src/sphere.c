@@ -24,15 +24,15 @@ bool hit_sphere(t_obj *sphere, t_ray *ray, t_hit *record)
     double  c;
     double  d;
 
-    oc = v3_sub(sphere->pos, ray->origin);
+    oc = v3_sub(sphere->shape.sphere.center, ray->origin);
     a = v3_dot(ray->direction, ray->direction);
     h = v3_dot(ray->direction, oc);
-    c = v3_dot(oc, oc) - sphere->radius * sphere->radius;
+    c = v3_dot(oc, oc) - sphere->shape.sphere.radius * sphere->shape.sphere.radius;
     d = h * h - a*c;
     if (d < 0)
         return (false);
     record->t = (h - sqrt(d) / a);
     record->p = ray_at(ray, record->t);
-    record->N = v3_unit(v3_sub(record->p, sphere->pos));
+    record->N = v3_unit(v3_sub(record->p, sphere->shape.sphere.center));
     return (true);
 }
