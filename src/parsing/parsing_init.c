@@ -42,7 +42,7 @@ static bool	alloc_world(t_world *wrld, size_t line_count)
 
 static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count, char *path)
 {
-	t_parsed_obj	obj;
+	
 	size_t			i;
 	char			*line;
 	char			*curr;
@@ -52,13 +52,13 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count, char *path
 	{
 		line = get_next_line(fd);
 		curr = line;
-		if (!parse_line(&curr, &obj))
+		if (!parse_line(&curr, wrld))
 		{
 			syntax_error(path, i + 1, line, curr);
 			free(line);
 			return (false);
 		}
-		pack_object(wrld, &obj);
+		
 		free(line);
 		i++;
 	}

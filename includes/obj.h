@@ -21,32 +21,18 @@ typedef enum
     ERR
 } t_obj_type;
 
-# define F_POS    (1 << 0)
-# define F_DIR    (1 << 1)
-# define F_RATIO  (1 << 2)
-# define F_FOV    (1 << 3)
-# define F_SIZE   (1 << 4)
-# define F_HEIGHT (1 << 5)
-# define F_COLOR  (1 << 6)
+typedef enum e_field_type {
+    F_VEC3,
+    F_DOUBLE,
+    F_COLOR,
+    F_END
+} t_field_type;
 
-# define F_FMT_SPHERE   (F_POS | F_SIZE | F_COLOR)
-# define F_FMT_PLANE    (F_POS | F_DIR | F_COLOR)
-# define F_FMT_CYLINDER (F_POS | F_DIR | F_SIZE | F_HEIGHT | F_COLOR)
-# define F_FMT_AMBIENT  (F_RATIO | F_COLOR)
-# define F_FMT_CAMERA   (F_POS | F_DIR | F_FOV)
-# define F_FMT_LIGHT    (F_POS | F_RATIO | F_COLOR)
-
-typedef struct s_parsed_obj
-{
-    t_obj_type  type;
-    t_vec3      pos;
-    t_vec3      dir;
-    double      radius;
-    double      height;
-    double      ratio;
-    t_vec3      color;
-    double      fov;
-} t_parsed_obj;
+typedef struct s_format {
+    t_field_type type;
+    size_t       offset;
+    const char   *name;
+} t_format;
 
 typedef struct s_material
 {
