@@ -58,7 +58,7 @@ int	main(void)
 
     t_world w;
     parse_file(&w, "exemplo.3d");
-    t_obj sph = w.map[0];
+    t_obj sph = w.objects[0];
 
     for (int y = 0; y < img.height; y++)
     {
