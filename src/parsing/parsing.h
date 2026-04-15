@@ -19,8 +19,13 @@ bool	parse_double(char **line, double *d);
 bool	parse_vec3_double(char **line, t_vec3 *vec);
 bool	parse_vec3_uchar(char **line, t_vec3 *vec);
 
-bool    parse_line(char **line, t_parsed_obj *obj);
-// parsing_pack.c
-void	pack_object(t_world *wrld, t_parsed_obj *parsed);
+bool    parse_line(char **line, t_world *wrld);
+
+const t_format  *get_sphere_fmt(void);
+const t_format  *get_plane_fmt(void);
+const t_format  *get_cylinder_fmt(void);
+const t_format  *get_ambient_fmt(void);
+const t_format  *get_camera_fmt(void);
+const t_format  *get_light_fmt(void);
 
 #endif
