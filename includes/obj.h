@@ -73,18 +73,11 @@ typedef struct s_camera
     double  fov;
     
     // rendering variables
-    double  aspect_ratio;
     int     image_width;
     int     image_height;
-    double  focal_length;
-    double  viewport_height;
-    double  viewport_width;
     t_vec3  camera_center;
-    t_vec3  viewport_u;
-    t_vec3  viewport_v;
     t_vec3  pixel_delta_u;
     t_vec3  pixel_delta_v;
-    t_vec3  viewport_upper_left;
     t_vec3  pixel00_loc;
 } t_camera;
 

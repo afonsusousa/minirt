@@ -46,11 +46,13 @@ int main(void)
     void *mlx;
     void *mlx_win;
     t_data img;
-    t_camera cam;
+    t_world w;
 
-    init_camera(&cam, 1080, 16.0 / 9.0);
-    img.width = cam.image_width;
-    img.height = cam.image_height;
+    parse_file(&w, "exemplo.3d");
+
+    init_camera(&w.camera, 1080, 16.0 / 9.0);
+    img.width = w.camera.image_width;
+    img.height = w.camera.image_height;
 
     mlx = mlx_init();
     mlx_win = mlx_new_window(mlx, img.width, img.height, "Hello world!");
@@ -58,22 +60,19 @@ int main(void)
     img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
                                  &img.endian);
 
-    t_world w;
-    parse_file(&w, "exemplo.3d");
-
     for (int y = 0; y < img.height; y++)
     {
         for (int x = 0; x < img.width; x++)
         {
             t_ray ray;
-            ray.origin = cam.camera_center;
+            ray.origin = w.camera.camera_center;
             ray.direction = v3_sub(
                 v3_add(
-                    cam.pixel00_loc,
+                    w.camera.pixel00_loc,
                     v3_add(
-                        v3_muls(cam.pixel_delta_u, x),
-                        v3_muls(cam.pixel_delta_v, y))),
-                cam.camera_center);
+                        v3_muls(w.camera.pixel_delta_u, x),
+                        v3_muls(w.camera.pixel_delta_v, y))),
+                w.camera.camera_center);
 
             my_mlx_pixel_put(&img, x, y, color_to_int(ray_color(&ray, &w, 1)));
         }

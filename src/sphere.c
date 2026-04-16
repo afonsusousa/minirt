@@ -33,10 +33,10 @@ bool hit_sphere(t_obj *sphere, t_ray *ray, t_interval ray_t, t_hit *record)
     d = h * h - a*c;
     if (d < 0)
         return (false);
-    root = (h - sqrt(d) / a);
+    root = (h - sqrt(d)) / a;
     if (!surrounds(ray_t, root))
     {
-        root = (h + sqrt(d) / a);
+        root = (h + sqrt(d)) / a;
         if (!surrounds(ray_t, root))
             return (false);
     }
