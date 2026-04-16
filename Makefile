@@ -10,6 +10,7 @@ SRCS := \
         $(SRC_DIR)/main.c \
         $(SRC_DIR)/pixel.c \
         $(SRC_DIR)/sphere.c \
+        $(SRC_DIR)/hit.c \
         $(SRC_DIR)/vec3.c \
         $(SRC_DIR)/parsing/parsing.c \
         $(SRC_DIR)/parsing/parsing_init.c \

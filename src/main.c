@@ -6,6 +6,7 @@
 #include "../includes/obj.h"
 #include "../includes/camera.h"
 #include "../includes/intersection.h"
+#include "../includes/interval.h"
 #include "../includes/world.h"
 #include <stdio.h>
 
@@ -18,7 +19,7 @@ t_color ray_color(t_ray *ray, t_world *world, size_t bounce)
     for (size_t i = 0; i < world->num_objects; i++)
     {
         t_hit record;
-        if (hit_sphere(&world->objects[i], ray, &record))
+        if (hit(&world->objects[i], ray, (t_interval){0, INFINITY}, &record))
         {
             return (v3_muls(
                 vec3(record.N.x + 1.0, record.N.y + 1.0, record.N.z + 1.0),

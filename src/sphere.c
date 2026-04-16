@@ -16,7 +16,7 @@
             vec3(N.x + 1.0, N.y + 1.0, N.z + 1.0),
             0.5
 */
-bool hit_sphere(t_obj *sphere, t_ray *ray, t_hit *record)
+bool hit_sphere(t_obj *sphere, t_ray *ray, t_interval ray_t, t_hit *record)
 {
     t_vec3	oc;
     double  a;
@@ -33,10 +33,10 @@ bool hit_sphere(t_obj *sphere, t_ray *ray, t_hit *record)
     if (d < 0)
         return (false);
     root = (h - sqrt(d) / a);
-    if (root < 0)
+    if (root <= ray_t.min || root >= ray_t.max)
     {
         root = (h + sqrt(d) / a);
-        if (root < 0)
+        if (root <= ray_t.min || root >= ray_t.max)
             return (false);
     }
     record->t = root;
