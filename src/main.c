@@ -13,11 +13,11 @@ t_color ray_color(t_ray *ray, t_world *world, size_t bounce)
 {
     t_vec3 unit_direction = v3_unit(ray->direction);
     double a = 0.5 * (unit_direction.y + 1.0);
-    t_hit record;
     (void)bounce;
 
     for (size_t i = 0; i < world->num_objects; i++)
     {
+        t_hit record;
         if (hit_sphere(&world->objects[i], ray, &record))
         {
             return (v3_muls(
