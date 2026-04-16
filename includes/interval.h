@@ -11,17 +11,17 @@ typedef struct s_interval
     double max;
 } t_interval;
 
-inline double interval_size(t_interval interval)
+static inline double interval_size(t_interval interval)
 {
     return (interval.max - interval.min);
 }
 
-inline bool contains(t_interval interval, double value)
+static inline bool contains(t_interval interval, double value)
 {
     return (interval.min <= value && value <= interval.max);
 }
 
-inline bool surrounds(t_interval interval, double value)
+static inline bool surrounds(t_interval interval, double value)
 {
     return (interval.min < value && value < interval.max);
 }

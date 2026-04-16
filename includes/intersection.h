@@ -16,6 +16,6 @@ typedef struct s_hit{
     t_vec3 N;
 }t_hit;
 
-bool hit(t_obj *obj, t_ray *ray, t_interval intl, t_hit *record);
+bool hit(t_obj *obj, t_ray *ray, t_interval intl, t_hit *rec);
 bool hit_sphere(t_obj *sphere, t_ray *ray, t_interval intl, t_hit *record);
 #endif //MINIRT_INTERSECTION_H

@@ -9,6 +9,7 @@
 #include "../includes/ray.h"
 #include "../includes/vec3.h"
 #include "../includes/intersection.h"
+//#include "../includes/interval.h"
 
 /*
  t_vec3 N = v3_unit(v3_sub(ray_at(ray, tzao), world->pos));
@@ -33,10 +34,10 @@ bool hit_sphere(t_obj *sphere, t_ray *ray, t_interval ray_t, t_hit *record)
     if (d < 0)
         return (false);
     root = (h - sqrt(d) / a);
-    if (root <= ray_t.min || root >= ray_t.max)
+    if (!surrounds(ray_t, root))
     {
         root = (h + sqrt(d) / a);
-        if (root <= ray_t.min || root >= ray_t.max)
+        if (!surrounds(ray_t, root))
             return (false);
     }
     record->t = root;
