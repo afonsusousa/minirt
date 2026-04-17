@@ -2,6 +2,7 @@
 #define MINIRT_COLOR_H
 
 #include "vec3.h"
+#include "interval.h"
 
 typedef t_vec3 t_color;
 
@@ -12,11 +13,13 @@ static inline unsigned int create_trgb(unsigned char t, unsigned char r, unsigne
 
 static inline unsigned int color_to_int(t_color c)
 {
+    static const t_interval intensity = {0.000, 0.999};
+
     return create_trgb(
         0,
-        (unsigned char)(255.999 * c.x),
-        (unsigned char)(255.999 * c.y),
-        (unsigned char)(255.999 * c.z)
+        (unsigned char)(256 * interval_clamp(intensity, c.x)),
+        (unsigned char)(256 * interval_clamp(intensity, c.y)),
+        (unsigned char)(256 * interval_clamp(intensity, c.z))
     );
 }
 

@@ -54,6 +54,10 @@ int main(void)
     img.width = w.camera.image_width;
     img.height = w.camera.image_height;
 
+    printf("w.camera.pixel00_loc: %f %f %f\n", w.camera.pixel00_loc.x, w.camera.pixel00_loc.y, w.camera.pixel00_loc.z);
+
+    printf("w.camera.pixel00_loc: %f %f %f\n", w.camera.pixel00_loc.x, w.camera.pixel00_loc.y, w.camera.pixel00_loc.z);
+
     mlx = mlx_init();
     mlx_win = mlx_new_window(mlx, img.width, img.height, "Hello world!");
     img.img = mlx_new_image(mlx, img.width, img.height);
@@ -64,17 +68,15 @@ int main(void)
     {
         for (int x = 0; x < img.width; x++)
         {
-            t_ray ray;
-            ray.origin = w.camera.camera_center;
-            ray.direction = v3_sub(
-                v3_add(
-                    w.camera.pixel00_loc,
-                    v3_add(
-                        v3_muls(w.camera.pixel_delta_u, x),
-                        v3_muls(w.camera.pixel_delta_v, y))),
-                w.camera.camera_center);
-
-            my_mlx_pixel_put(&img, x, y, color_to_int(ray_color(&ray, &w, 1)));
+            t_color pixel_color = vec3(0, 0, 0);
+            for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
+            {
+                t_ray ray = get_ray(&w.camera, x, y);
+                t_color sample_color = ray_color(&ray, &w, 1);
+                v3_add_mut(&pixel_color, &sample_color);
+            }
+            v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);
+            my_mlx_pixel_put(&img, x, y, color_to_int(pixel_color));
         }
     }
 

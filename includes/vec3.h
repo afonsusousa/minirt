@@ -6,6 +6,7 @@
 #define MINIRT_VEC3_H
 
 #include <math.h>
+#include <stdint.h>
 
 typedef struct s_vec3
 {
@@ -173,6 +174,46 @@ static inline int v3_near_zero(t_vec3 vec)
 {
     double s = 1e-8;
     return (fabs(vec.x) < s && fabs(vec.y) < s && fabs(vec.z) < s);
+}
+
+// --- Fast RNG Setup (PCG32) ---
+typedef struct s_pcg32_random {
+    uint64_t state;
+    uint64_t inc;
+} t_pcg32_random;
+
+// 32 bit random integer
+static inline uint32_t pcg32_random_r(t_pcg32_random *rng) {
+    uint64_t oldstate = rng->state;
+    rng->state = oldstate * 6364136223846793005ULL + (rng->inc | 1);
+    uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    uint32_t rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+// Random double in [0.0, 1.0)
+// Multiply by 1.0 / (2^32)
+static inline double pcg_double(t_pcg32_random *rng) {
+    uint32_t raw = pcg32_random_r(rng);
+    return raw * 2.3283064365386963e-10; 
+}
+
+static inline double pcg_range_double(t_pcg32_random *rng, double min, double max) {
+    return min + (max - min) * pcg_double(rng);
+}
+
+static inline t_vec3 random_in_unit_sphere(t_pcg32_random *rng) {
+    while (1) {
+        t_vec3 p = vec3(
+            pcg_range_double(rng, -1.0, 1.0),
+            pcg_range_double(rng, -1.0, 1.0),
+            pcg_range_double(rng, -1.0, 1.0)
+        );
+        
+        if (v3_len_sq(p) < 1.0) {
+            return p;
+        }
+    }
 }
 
 #endif //MINIRT_VEC3_H

@@ -46,10 +46,46 @@ static void	set_viewport_origin(t_camera *cam, double v_w, double v_h)
 				0.5));
 }
 
+static t_vec3 sample_square(t_camera *cam)
+{
+	return vec3(
+		pcg_double(&cam->rng) - 0.5,
+		pcg_double(&cam->rng) - 0.5,
+		0
+	);
+}
+
+t_ray get_ray(t_camera *cam, int i, int j)
+{
+	t_vec3 offset;
+	t_vec3 pixel_sample;
+	t_vec3 ray_origin;
+	t_vec3 ray_direction;
+	
+	offset = sample_square(cam);
+	pixel_sample = v3_add(
+		cam->pixel00_loc,
+		v3_add(
+			v3_muls(cam->pixel_delta_u, i + offset.x),
+			v3_muls(cam->pixel_delta_v, j + offset.y)
+		)
+	);
+	
+	ray_origin = cam->camera_center;
+	ray_direction = v3_sub(pixel_sample, ray_origin);
+	
+	return ((t_ray){ray_origin, ray_direction});
+}
+
 void	init_camera(t_camera *cam, int image_width, double aspect_ratio)
 {
 	double	v_width;
 	double	v_height;
+
+	cam->samples_per_pixel = 10;
+	cam->pixel_samples_scale = 1.0 / cam->samples_per_pixel;
+	cam->rng.state = 0x853c49e6748fea9bULL;
+	cam->rng.inc = 0xda3e39cb94b95bdbULL;
 
 	cam->image_width = image_width;
 	cam->image_height = (int)(cam->image_width / aspect_ratio);
