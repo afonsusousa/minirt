@@ -4,8 +4,6 @@
 #include "vec3.h"
 #include "interval.h"
 
-typedef t_vec3 t_color;
-
 static inline unsigned int create_trgb(unsigned char t, unsigned char r, unsigned char g, unsigned char b)
 {
     return (t << 24 | r << 16 | g << 8 | b);

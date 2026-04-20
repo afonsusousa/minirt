@@ -16,7 +16,9 @@ typedef struct s_vec3
 } t_vec3;
 
 typedef t_vec3 t_point;
+typedef t_vec3 t_color;
 
+#define BASICALLY_ZERO 1e-160
 /* creation */
 
 static inline t_vec3 vec3(double x, double y, double z)
@@ -159,9 +161,9 @@ static inline t_vec3 v3_unit(t_vec3 vec)
     return (v3_divs(vec, v3_len(vec)));
 }
 
-static inline double v3_dot(t_vec3 a, t_vec3 b)
+static inline double v3_dot(t_vec3 *a, t_vec3 *b)
 {
-    return (a.x * b.x + a.y * b.y + a.z * b.z);
+    return (a->x * b->x + a->y * b->y + a->z * b->z);
 }
 static inline void v3_unit_mut(t_vec3 *dest)
 {
@@ -203,6 +205,9 @@ static inline double pcg_range_double(t_pcg32_random *rng, double min, double ma
 }
 
 static inline t_vec3 random_in_unit_sphere(t_pcg32_random *rng) {
+    
+    double len_sq;
+    
     while (1) {
         t_vec3 p = vec3(
             pcg_range_double(rng, -1.0, 1.0),
@@ -210,10 +215,21 @@ static inline t_vec3 random_in_unit_sphere(t_pcg32_random *rng) {
             pcg_range_double(rng, -1.0, 1.0)
         );
         
-        if (v3_len_sq(p) < 1.0) {
+        len_sq = v3_len_sq(p);
+        if (len_sq <= 1.0 && len_sq > BASICALLY_ZERO) {
+            v3_divs_mut(&p, sqrt(len_sq));
             return p;
         }
     }
+}
+
+static inline t_vec3 random_on_hemisphere(t_pcg32_random *rng,  t_vec3 *normal) 
+{
+    t_vec3 on_unit_sphere = random_in_unit_sphere(rng);
+    if(v3_dot(&on_unit_sphere, normal) > 0.0)
+        return on_unit_sphere;
+    else
+        return (v3_neg_mut(&on_unit_sphere), on_unit_sphere);
 }
 
 #endif //MINIRT_VEC3_H
