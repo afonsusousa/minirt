@@ -19,11 +19,13 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
     for (size_t i = 0; i < world->num_objects; i++)
     {
         t_hit record;
+        if (bounce <= 0)
+            return (vec3(0, 0, 0));
         if (hit(&world->objects[i], r, (t_interval){0, INFINITY}, &record))
         {
             t_vec3 dir = random_on_hemisphere(&c->rng, &record.N);
             return (v3_muls(
-                ray_color(c, &((t_ray) { record.p, dir}), world, bounce),
+                ray_color(c, &((t_ray) { record.p, dir}), world, bounce - 1),
                 0.5));
         }
     }
@@ -38,9 +40,7 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
 void my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
 {
     char *dst;
-
-    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-    *(unsigned int *)dst = color;
+dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8)); *(unsigned int *)dst = color;
 }
 
 int main(void)
@@ -74,7 +74,7 @@ int main(void)
             for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
             {
                 t_ray ray = get_ray(&w.camera, x, y);
-                t_color sample_color = ray_color(&w.camera, &ray, &w, 1);
+                t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
                 v3_add_mut(&pixel_color, &sample_color);
             }
             v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);
