@@ -25,6 +25,7 @@ typedef enum e_field_type {
     F_VEC3,
     F_DOUBLE,
     F_COLOR,
+    F_OPT_MAT,
     F_END
 } t_field_type;
 
@@ -59,6 +60,7 @@ typedef struct s_material
 {
     t_material_type type;
     t_vec3 color;
+    double fuzz;
     t_scatter_func scatter;
 } t_material;
 

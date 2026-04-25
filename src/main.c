@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
+/*   Updated: 2026/04/25 18:55:59 by amagno-r         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../lib/minilibx-linux/mlx.h"
 #include "../includes/mlx_mitm.h"
 #include "../includes/color.h"
@@ -10,91 +22,56 @@
 #include "../includes/world.h"
 #include <stdio.h>
 
-t_vec3 scatter_lambertian(t_ray *r, t_hit *record, t_ray *scattered, t_material *mat)
+static bool	get_closest_hit(t_ray *r, t_world *world, t_hit *closest_record, t_material **closest_mat)
 {
-    t_vec3 scatter_dir;
+	t_hit	record;
+	bool	hit_anything;
+	double	closest_so_far;
+	size_t	i;
 
-    scatter_dir = v3_add(record->N, random_on_hemisphere(&((t_camera *)r)->rng, &record->N));
-    if(v3_near_zero(scatter_dir))
-        scatter_dir = record->N;
-    *scattered = (t_ray){record->p, scatter_dir};
-    return (mat->color);
+	hit_anything = false;
+	closest_so_far = INFINITY;
+	i = 0;
+	while (i < world->num_objects)
+	{
+		if (hit(&world->objects[i], r, (t_interval){0.001, closest_so_far}, &record))
+		{
+			hit_anything = true;
+			closest_so_far = record.t;
+			*closest_record = record;
+			*closest_mat = &world->materials[world->objects[i].mat_idx];
+		}
+		i++;
+	}
+	return (hit_anything);
 }
 
-t_vec3 scatter_metal(t_ray *r, t_hit *record, t_ray *scattered, t_material *mat)
+t_vec3	ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
 {
-    t_vec3 reflected;
+	t_hit		closest_record;
+	t_material	*closest_mat;
+	t_ray		scattered;
+	t_vec3		unit_dir;
+	double		a;
 
-    reflected = v3_reflect(r->direction, record->N); 
-    *scattered = (t_ray){record->p, reflected};
-    return (mat->color); // Or modify somehow based on metal properties
+	if (bounce <= 0)
+		return (vec3(0, 0, 0));
+	if (get_closest_hit(r, world, &closest_record, &closest_mat))
+	{
+		unit_dir = closest_mat->scatter(r, &closest_record, &scattered, closest_mat);
+		return (v3_mul(ray_color(c, &scattered, world, bounce - 1), unit_dir));
+	}
+	unit_dir = v3_unit(r->direction);
+	a = 0.5 * (unit_dir.y + 1.0);
+	return (v3_add(v3_muls(vec3(1.0, 1.0, 1.0), 1.0 - a),
+			v3_muls(vec3(0.5, 0.7, 1.0), a)));
 }
-
-t_vec3 scatter_default(t_ray *r, t_hit *record, t_ray *scattered, t_material *mat)
-{
-    t_vec3 scatter_dir;
-
-    scatter_dir = random_on_hemisphere(&((t_camera *)r)->rng, &record->N);
-    *scattered = (t_ray){record->p, scatter_dir};
-    return (v3_muls(mat->color, 0.5)); // Arbitrary default fallback handling
-}
-
-t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
-{
-    if (bounce <= 0)
-        return (vec3(0, 0, 0));
-
-    t_hit record;
-    t_hit closest_record;
-    bool hit_anything = false;
-    double closest_so_far = INFINITY;
-    t_material *closest_mat = NULL;
-
-    for (size_t i = 0; i < world->num_objects; i++)
-    {
-        if (hit(&world->objects[i], r, (t_interval){0.001, closest_so_far}, &record))
-        {
-            hit_anything = true;
-            closest_so_far = record.t;
-            closest_record = record;
-            closest_mat = &world->materials[world->objects[i].mat_idx];
-        }
-    }
-
-    if (hit_anything)
-    {
-        t_ray scattered;
-        t_vec3 attenuation = closest_mat->scatter(r, &closest_record, &scattered, closest_mat);
-        return (v3_mul(ray_color(c, &scattered, world, bounce - 1), attenuation));
-    }
-
-    t_vec3 unit_direction = v3_unit(r->direction);
-    double a = 0.5 * (unit_direction.y + 1.0);
-    // Sky gradient: white to blue
-    return (v3_add(
-        v3_muls(vec3(1.0, 1.0, 1.0), 1.0 - a),
-        v3_muls(vec3(0.5, 0.7, 1.0), a)));
-}
-
 
 void my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
 {
     char *dst;
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
     *(unsigned int *)dst = color;
-}
-
-void assign_material_scatter_funcs(t_world *w)
-{
-    for (size_t i = 0; i < w->num_materials; i++)
-    {
-        if (w->materials[i].type == MAT_LIMBERTIAN)
-            w->materials[i].scatter = scatter_lambertian;
-        else if (w->materials[i].type == MAT_METAL)
-            w->materials[i].scatter = scatter_metal;
-        else
-            w->materials[i].scatter = scatter_default;
-    }
 }
 
 int main(void)
@@ -105,17 +82,6 @@ int main(void)
     t_world w;
 
     parse_file(&w, "exemplo2.3d");
-
-    for (size_t i = 0; i < w.num_objects; i++)
-    {
-        if (w.objects[i].type == OBJ_SPHERE)
-        {
-            size_t mat_id = w.objects[i].mat_idx;
-            w.materials[mat_id].type = MAT_METAL;
-            if (mat_id == 0 || mat_id == 3)
-                w.materials[mat_id].type = MAT_LIMBERTIAN;
-        }
-    }
 
     assign_material_scatter_funcs(&w);
 
