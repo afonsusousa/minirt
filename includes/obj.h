@@ -28,14 +28,31 @@ typedef enum e_field_type {
     F_END
 } t_field_type;
 
+typedef enum e_material_type {
+    MAT_LIMBERTIAN = 1,
+    MAT_METAL,
+    MAT_END
+} t_material_type;
+
 typedef struct s_format {
     t_field_type type;
     size_t       offset;
     const char   *name;
 } t_format;
 
+typedef struct s_lambertian
+{
+    t_vec3 *albedo;
+} t_lambertian;
+
+typedef struct s_metal
+{
+    t_vec3 *albedo;
+} t_metal;
+
 typedef struct s_material
 {
+    t_material_type type;
     t_vec3 color;
 } t_material;
 

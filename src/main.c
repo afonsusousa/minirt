@@ -10,6 +10,21 @@
 #include "../includes/world.h"
 #include <stdio.h>
 
+void scatter_lambertian(t_ray *r, t_hit *record, t_vec3 *scatter_dir, t_ray *scattered)
+{
+    *scatter_dir = v3_add(record->N, random_on_hemisphere(&((t_camera *)r)->rng, &record->N));
+    if(v3_near_zero(*scatter_dir))
+        *scatter_dir = record->N;
+    *scattered = (t_ray){record->p, *scatter_dir};
+}
+
+void scatter_metal(t_ray *r, t_hit *record, t_vec3 *reflected, t_ray *scattered)
+{
+    *reflected = v3_reflect(r->direction, record->N); 
+    *scattered = (t_ray){record->p, *reflected};
+}
+
+
 t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
 {
     t_vec3 unit_direction = v3_unit(r->direction);
@@ -23,7 +38,26 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
             return (vec3(0, 0, 0));
         if (hit(&world->objects[i], r, (t_interval){0, INFINITY}, &record))
         {
-            t_vec3 dir = random_on_hemisphere(&c->rng, &record.N);
+            t_ray scattered;
+            t_vec3 scatter_dir;
+            if (world->materials[i].type == MAT_LIMBERTIAN)
+            {
+                double attenuation = 0.5;
+                scatter_lambertian(r, &record, &scatter_dir, &scattered);
+                return (v3_muls(
+                    ray_color(c, &scattered, world, bounce - 1),
+                    attenuation));
+            }
+            if (world->materials[i].type == MAT_METAL)
+            {
+                double attenuation = 0.8;
+                scatter_metal(r, &record, &scatter_dir, &scattered);
+                return (v3_muls(
+                    ray_color(c, &scattered, world, bounce - 1),
+                    attenuation));
+            }
+            //return (vec3(0, 0, 50));
+            t_vec3 dir = random_on_hemisphere(&((t_camera *)r)->rng, &record.N); 
             return (v3_muls(
                 ray_color(c, &((t_ray) { record.p, dir}), world, bounce - 1),
                 0.5));
@@ -51,7 +85,7 @@ int main(void)
     t_data img;
     t_world w;
 
-    parse_file(&w, "exemplo.3d");
+    parse_file(&w, "exemplo2.3d");
 
     init_camera(&w.camera, 1080, 16.0 / 9.0);
     img.width = w.camera.image_width;

@@ -98,7 +98,16 @@ bool	parse_line(char **line, t_world *wrld)
 	if (**line == '\0' || **line == '\n')
 		return (true);
 	if (match_object(line, wrld, &target, &fmt))
+	{
+		if(((t_obj *)target)->type == OBJ_SPHERE)
+		{
+			wrld->materials[wrld->num_materials].type = MAT_METAL;
+			if (wrld->num_materials == 0 || wrld->num_materials == 3)
+				wrld->materials[wrld->num_materials].type = MAT_LIMBERTIAN;
+			((t_obj *)target)->mat_idx = wrld->num_materials++;
+		}
 		return (parse_format(wrld, target, fmt, line));
+	}
 	if (match_id(line, "A"))
 		return (parse_format(wrld, &wrld->ambient, get_ambient_fmt(), line));
 	if (match_id(line, "C"))
