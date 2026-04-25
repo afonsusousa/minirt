@@ -44,19 +44,28 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
     if (bounce <= 0)
         return (vec3(0, 0, 0));
 
+    t_hit record;
+    t_hit closest_record;
+    bool hit_anything = false;
+    double closest_so_far = INFINITY;
+    t_material *closest_mat = NULL;
+
     for (size_t i = 0; i < world->num_objects; i++)
     {
-        t_hit record;
-        if (hit(&world->objects[i], r, (t_interval){0, INFINITY}, &record))
+        if (hit(&world->objects[i], r, (t_interval){0.001, closest_so_far}, &record))
         {
-            t_ray scattered;
-            t_material *mat = &world->materials[i];
-
-            // No branch! The parsing/assignment step guarantees mat->scatter is always valid 
-            t_vec3 attenuation = mat->scatter(r, &record, &scattered, mat);
-
-            return (v3_mul(ray_color(c, &scattered, world, bounce - 1), attenuation));
+            hit_anything = true;
+            closest_so_far = record.t;
+            closest_record = record;
+            closest_mat = &world->materials[world->objects[i].mat_idx];
         }
+    }
+
+    if (hit_anything)
+    {
+        t_ray scattered;
+        t_vec3 attenuation = closest_mat->scatter(r, &closest_record, &scattered, closest_mat);
+        return (v3_mul(ray_color(c, &scattered, world, bounce - 1), attenuation));
     }
 
     t_vec3 unit_direction = v3_unit(r->direction);
@@ -96,6 +105,18 @@ int main(void)
     t_world w;
 
     parse_file(&w, "exemplo2.3d");
+
+    for (size_t i = 0; i < w.num_objects; i++)
+    {
+        if (w.objects[i].type == OBJ_SPHERE)
+        {
+            size_t mat_id = w.objects[i].mat_idx;
+            w.materials[mat_id].type = MAT_METAL;
+            if (mat_id == 0 || mat_id == 3)
+                w.materials[mat_id].type = MAT_LIMBERTIAN;
+        }
+    }
+
     assign_material_scatter_funcs(&w);
 
     init_camera(&w.camera, 1080, 16.0 / 9.0);
