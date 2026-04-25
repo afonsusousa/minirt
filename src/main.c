@@ -10,60 +10,57 @@
 #include "../includes/world.h"
 #include <stdio.h>
 
-void scatter_lambertian(t_ray *r, t_hit *record, t_vec3 *scatter_dir, t_ray *scattered)
+t_vec3 scatter_lambertian(t_ray *r, t_hit *record, t_ray *scattered, t_material *mat)
 {
-    *scatter_dir = v3_add(record->N, random_on_hemisphere(&((t_camera *)r)->rng, &record->N));
-    if(v3_near_zero(*scatter_dir))
-        *scatter_dir = record->N;
-    *scattered = (t_ray){record->p, *scatter_dir};
+    t_vec3 scatter_dir;
+
+    scatter_dir = v3_add(record->N, random_on_hemisphere(&((t_camera *)r)->rng, &record->N));
+    if(v3_near_zero(scatter_dir))
+        scatter_dir = record->N;
+    *scattered = (t_ray){record->p, scatter_dir};
+    return (mat->color);
 }
 
-void scatter_metal(t_ray *r, t_hit *record, t_vec3 *reflected, t_ray *scattered)
+t_vec3 scatter_metal(t_ray *r, t_hit *record, t_ray *scattered, t_material *mat)
 {
-    *reflected = v3_reflect(r->direction, record->N); 
-    *scattered = (t_ray){record->p, *reflected};
+    t_vec3 reflected;
+
+    reflected = v3_reflect(r->direction, record->N); 
+    *scattered = (t_ray){record->p, reflected};
+    return (mat->color); // Or modify somehow based on metal properties
 }
 
+t_vec3 scatter_default(t_ray *r, t_hit *record, t_ray *scattered, t_material *mat)
+{
+    t_vec3 scatter_dir;
+
+    scatter_dir = random_on_hemisphere(&((t_camera *)r)->rng, &record->N);
+    *scattered = (t_ray){record->p, scatter_dir};
+    return (v3_muls(mat->color, 0.5)); // Arbitrary default fallback handling
+}
 
 t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
 {
-    t_vec3 unit_direction = v3_unit(r->direction);
-    double a = 0.5 * (unit_direction.y + 1.0);
-    (void)bounce;
+    if (bounce <= 0)
+        return (vec3(0, 0, 0));
 
     for (size_t i = 0; i < world->num_objects; i++)
     {
         t_hit record;
-        if (bounce <= 0)
-            return (vec3(0, 0, 0));
         if (hit(&world->objects[i], r, (t_interval){0, INFINITY}, &record))
         {
             t_ray scattered;
-            t_vec3 scatter_dir;
-            if (world->materials[i].type == MAT_LIMBERTIAN)
-            {
-                double attenuation = 0.5;
-                scatter_lambertian(r, &record, &scatter_dir, &scattered);
-                return (v3_muls(
-                    ray_color(c, &scattered, world, bounce - 1),
-                    attenuation));
-            }
-            if (world->materials[i].type == MAT_METAL)
-            {
-                double attenuation = 0.8;
-                scatter_metal(r, &record, &scatter_dir, &scattered);
-                return (v3_muls(
-                    ray_color(c, &scattered, world, bounce - 1),
-                    attenuation));
-            }
-            //return (vec3(0, 0, 50));
-            t_vec3 dir = random_on_hemisphere(&((t_camera *)r)->rng, &record.N); 
-            return (v3_muls(
-                ray_color(c, &((t_ray) { record.p, dir}), world, bounce - 1),
-                0.5));
+            t_material *mat = &world->materials[i];
+
+            // No branch! The parsing/assignment step guarantees mat->scatter is always valid 
+            t_vec3 attenuation = mat->scatter(r, &record, &scattered, mat);
+
+            return (v3_mul(ray_color(c, &scattered, world, bounce - 1), attenuation));
         }
     }
 
+    t_vec3 unit_direction = v3_unit(r->direction);
+    double a = 0.5 * (unit_direction.y + 1.0);
     // Sky gradient: white to blue
     return (v3_add(
         v3_muls(vec3(1.0, 1.0, 1.0), 1.0 - a),
@@ -78,6 +75,19 @@ void my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
     *(unsigned int *)dst = color;
 }
 
+void assign_material_scatter_funcs(t_world *w)
+{
+    for (size_t i = 0; i < w->num_materials; i++)
+    {
+        if (w->materials[i].type == MAT_LIMBERTIAN)
+            w->materials[i].scatter = scatter_lambertian;
+        else if (w->materials[i].type == MAT_METAL)
+            w->materials[i].scatter = scatter_metal;
+        else
+            w->materials[i].scatter = scatter_default;
+    }
+}
+
 int main(void)
 {
     void *mlx;
@@ -86,6 +96,7 @@ int main(void)
     t_world w;
 
     parse_file(&w, "exemplo2.3d");
+    assign_material_scatter_funcs(&w);
 
     init_camera(&w.camera, 1080, 16.0 / 9.0);
     img.width = w.camera.image_width;

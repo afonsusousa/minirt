@@ -50,10 +50,16 @@ typedef struct s_metal
     t_vec3 *albedo;
 } t_metal;
 
+struct s_hit;
+struct s_material;
+
+typedef t_vec3 (*t_scatter_func)(t_ray *r, struct s_hit *record, t_ray *scattered, struct s_material *mat);
+
 typedef struct s_material
 {
     t_material_type type;
     t_vec3 color;
+    t_scatter_func scatter;
 } t_material;
 
 typedef struct s_obj
