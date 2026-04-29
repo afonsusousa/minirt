@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 19:14:35 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/04/29 19:13:59 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
         return (vec3(0, 0, 0));
     if (get_closest_hit(r, world, &closest_record, &closest_mat))
     {
-        unit_dir = closest_mat->scatter(r, &closest_record, &scattered, closest_mat);
+        scattered.direction = r->direction;
+        unit_dir = closest_mat->scatter(c, &closest_record, &scattered, closest_mat);
         return (v3_mul(ray_color(c, &scattered, world, bounce - 1), unit_dir));
     }
     unit_dir = v3_unit(r->direction);
@@ -81,7 +82,7 @@ int main(void)
     void *mlx;
     void *mlx_win;
     t_data img;
-    t_world w;
+    t_world w __attribute__((aligned(32)));
 
     parse_file(&w, "exemplo2.3d");
 
@@ -131,11 +132,10 @@ int main(void)
                     if (px >= img.width || py >= img.height)
                         continue;
                     t_color pixel_color = vec3(0, 0, 0);
-
                     for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
                     {
                         t_ray ray = get_ray(&w.camera, px, py);
-                        t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
+                        t_color sample_color = ray_color(&w.camera, &ray, &w, 50);
                         v3_add_mut(&pixel_color, &sample_color);
                     }
                     v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);

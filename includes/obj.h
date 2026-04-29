@@ -43,8 +43,9 @@ typedef struct s_format {
 
 struct s_hit;
 struct s_material;
+struct s_camera;
 
-typedef t_vec3 (*t_scatter_func)(t_ray *r, struct s_hit *record, t_ray *scattered, struct s_material *mat);
+typedef t_vec3 (*t_scatter_func)(struct s_camera *c, struct s_hit *record, t_ray *scattered, struct s_material *mat);
 
 typedef struct s_material
 {
@@ -52,7 +53,7 @@ typedef struct s_material
     t_vec3 color;
     double fuzz;
     t_scatter_func scatter;
-} t_material;
+} __attribute__((aligned(32))) t_material;
 
 typedef struct s_obj
 {
@@ -79,7 +80,7 @@ typedef struct s_obj
         } cylinder;
 
     } shape;
-} t_obj;
+} __attribute__((aligned(32))) t_obj;
 
 typedef struct s_camera
 {
@@ -97,7 +98,7 @@ typedef struct s_camera
     int     samples_per_pixel;
     double  pixel_samples_scale;
     t_pcg32_random rng; // random state
-} t_camera;
+} __attribute__((aligned(32))) t_camera;
 
 typedef struct s_light
 {
@@ -124,6 +125,6 @@ typedef struct s_world
     t_ambient   ambient;
     t_light     *lights;
     size_t      num_lights;
-} t_world;
+} __attribute__((aligned(32))) t_world;
 
 #endif //MINIRT_OBJ_H

@@ -8,12 +8,14 @@
 #include <math.h>
 #include <stdint.h>
 
-typedef struct s_vec3
-{
-    double x;
-    double y;
-    double z;
-    double pad;
+typedef union s_vec3 {
+    struct {
+        double x;
+        double y;
+        double z;
+        double w;
+    };
+    double e[4];
 } t_vec3;
 
 typedef t_vec3 t_point;
@@ -23,10 +25,11 @@ typedef t_vec3 t_color;
 /* creation */
 
 static inline t_vec3 vec3(double x, double y, double z) {
-    t_vec3 res = {0}; // This explicitly zeroes out the hidden padding bytes
+    t_vec3 res;
     res.x = x; 
     res.y = y; 
     res.z = z;
+    res.w = 0.0;
     return res;
 }
 
@@ -75,7 +78,7 @@ static inline t_vec3 v3_neg(t_vec3 vec)
 
 static inline t_vec3 v3_reflect(t_vec3 v, t_vec3 n)
 {
-    t_vec3 scaled_n = v3_muls(n, 2 * (v.x * n.x + v.y * n.y + v.z * n.z));
+    t_vec3 scaled_n = v3_muls(n, 2.0 * (v.x * n.x + v.y * n.y + v.z * n.z));
     return (v3_sub(v, scaled_n));
 }
 
@@ -93,6 +96,7 @@ static inline void v3_add_mut(t_vec3 *dest, t_vec3 *value)
     dest->x += value->x;
     dest->y += value->y;
     dest->z += value->z;
+    dest->w = 0.0;
 }
 
 static inline void v3_sub_mut(t_vec3 *dest, t_vec3 *value)
@@ -100,6 +104,7 @@ static inline void v3_sub_mut(t_vec3 *dest, t_vec3 *value)
     dest->x -= value->x;
     dest->y -= value->y;
     dest->z -= value->z;
+    dest->w = 0.0;
 }
 
 static inline void v3_mul_mut(t_vec3 *dest, t_vec3 *value)
@@ -107,6 +112,7 @@ static inline void v3_mul_mut(t_vec3 *dest, t_vec3 *value)
     dest->x *= value->x;
     dest->y *= value->y;
     dest->z *= value->z;
+    dest->w = 0.0;
 }
 
 static inline void v3_muls_mut(t_vec3 *dest, double t)
@@ -114,6 +120,7 @@ static inline void v3_muls_mut(t_vec3 *dest, double t)
     dest->x *= t;
     dest->y *= t;
     dest->z *= t;
+    dest->w = 0.0;
 }
 
 static inline void v3_divs_mut(t_vec3 *dest, double t)
@@ -121,6 +128,7 @@ static inline void v3_divs_mut(t_vec3 *dest, double t)
     dest->x /= t;
     dest->y /= t;
     dest->z /= t;
+    dest->w = 0.0;
 }
 
 static inline void v3_neg_mut(t_vec3 *dest)
@@ -128,6 +136,7 @@ static inline void v3_neg_mut(t_vec3 *dest)
     dest->x = -dest->x;
     dest->y = -dest->y;
     dest->z = -dest->z;
+    dest->w = 0.0;
 }
 
 static inline void v3_cross_mut(t_vec3 *dest, t_vec3 *value)
@@ -138,14 +147,16 @@ static inline void v3_cross_mut(t_vec3 *dest, t_vec3 *value)
     dest->x = temp_x;
     dest->y = temp_y;
     dest->z = temp_z;
+    dest->w = 0.0;
 }
 
 static inline void v3_reflect_mut(t_vec3 *dest, t_vec3 *n)
 {
     double dot_prod = dest->x * n->x + dest->y * n->y + dest->z * n->z;
-    dest->x -= 2 * dot_prod * n->x;
-    dest->y -= 2 * dot_prod * n->y;
-    dest->z -= 2 * dot_prod * n->z;
+    dest->x -= 2.0 * dot_prod * n->x;
+    dest->y -= 2.0 * dot_prod * n->y;
+    dest->z -= 2.0 * dot_prod * n->z;
+    dest->w = 0.0;
 }
 
 /* scalar & utility functions */
@@ -157,25 +168,29 @@ static inline double v3_len_sq(t_vec3 vec)
 
 static inline double v3_len(t_vec3 vec)
 {
-    return (sqrt(v3_len_sq(vec)));
+    return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
 
 static inline t_vec3 v3_unit(t_vec3 vec)
 {
-    return (v3_divs(vec, v3_len(vec)));
+    double len = sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    return (vec3(vec.x / len, vec.y / len, vec.z / len));
 }
 
 static inline double v3_dot(t_vec3 *a, t_vec3 *b)
 {
     return (a->x * b->x + a->y * b->y + a->z * b->z);
 }
+
 static inline void v3_unit_mut(t_vec3 *dest)
 {
     double length = sqrt(dest->x * dest->x + dest->y * dest->y + dest->z * dest->z);
     dest->x /= length;
     dest->y /= length;
     dest->z /= length;
+    dest->w = 0.0;
 }
+
 static inline int v3_near_zero(t_vec3 vec)
 {
     double s = 1e-8;
@@ -219,9 +234,13 @@ static inline t_vec3 random_in_unit_sphere(t_pcg32_random *rng) {
             pcg_range_double(rng, -1.0, 1.0)
         );
         
-        len_sq = v3_len_sq(p);
+        len_sq = p.x * p.x + p.y * p.y + p.z * p.z;
         if (len_sq <= 1.0 && len_sq > BASICALLY_ZERO) {
-            v3_divs_mut(&p, sqrt(len_sq));
+            double root = sqrt(len_sq);
+            p.x /= root;
+            p.y /= root;
+            p.z /= root;
+            p.w = 0.0;
             return p;
         }
     }
@@ -230,10 +249,16 @@ static inline t_vec3 random_in_unit_sphere(t_pcg32_random *rng) {
 static inline t_vec3 random_on_hemisphere(t_pcg32_random *rng,  t_vec3 *normal) 
 {
     t_vec3 on_unit_sphere = random_in_unit_sphere(rng);
-    if(v3_dot(&on_unit_sphere, normal) > 0.0)
+    if((on_unit_sphere.x * normal->x + on_unit_sphere.y * normal->y + on_unit_sphere.z * normal->z) > 0.0)
         return on_unit_sphere;
     else
-        return (v3_neg_mut(&on_unit_sphere), on_unit_sphere);
+    {
+        on_unit_sphere.x = -on_unit_sphere.x;
+        on_unit_sphere.y = -on_unit_sphere.y;
+        on_unit_sphere.z = -on_unit_sphere.z;
+        on_unit_sphere.w = 0.0;
+        return on_unit_sphere;
+    }
 }
 
 #endif //MINIRT_VEC3_H

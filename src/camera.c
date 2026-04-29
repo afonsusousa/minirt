@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:35 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 18:56:36 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/04/29 19:13:49 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	init_camera(t_camera *cam, int image_width, double aspect_ratio)
 	double	v_width;
 	double	v_height;
 
-	cam->samples_per_pixel = 100;
+	cam->samples_per_pixel = 10;
 	cam->pixel_samples_scale = 1.0 / cam->samples_per_pixel;
 	cam->rng.state = 0x853c49e6748fea9bULL;
 	cam->rng.inc = 0xda3e39cb94b95bdbULL;
