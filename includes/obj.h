@@ -45,7 +45,7 @@ struct s_hit;
 struct s_material;
 struct s_camera;
 
-typedef t_vec3 (*t_scatter_func)(struct s_camera *c, struct s_hit *record, t_ray *scattered, struct s_material *mat);
+typedef bool (*t_scatter_func)(struct s_camera *c, struct s_hit *record, t_ray *scattered, struct s_material *mat);
 
 typedef struct s_material
 {

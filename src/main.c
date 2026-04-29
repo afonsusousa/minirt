@@ -59,7 +59,10 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
     if (get_closest_hit(r, world, &closest_record, &closest_mat))
     {
         scattered.direction = r->direction;
-        unit_dir = closest_mat->scatter(c, &closest_record, &scattered, closest_mat);
+        unit_dir = closest_mat->color;
+        //false here is hacky af
+        v3_muls_mut(&unit_dir, 
+            0.5 + (0.5 * closest_mat->scatter(c, &closest_record, &scattered, closest_mat)));
         return (v3_mul(ray_color(c, &scattered, world, bounce - 1), unit_dir));
     }
     unit_dir = v3_unit(r->direction);
@@ -88,7 +91,7 @@ int main(void)
 
     assign_material_scatter_funcs(&w);
 
-    init_camera(&w.camera, 1080, 16.0 / 9.0);
+    init_camera(&w.camera, 1920, 16.0 / 9.0);
     img.width = w.camera.image_width;
     img.height = w.camera.image_height;
 
@@ -135,7 +138,7 @@ int main(void)
                     for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
                     {
                         t_ray ray = get_ray(&w.camera, px, py);
-                        t_color sample_color = ray_color(&w.camera, &ray, &w, 50);
+                        t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
                         v3_add_mut(&pixel_color, &sample_color);
                     }
                     v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);
