@@ -70,6 +70,8 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
 void my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
 {
     char *dst;
+    if (data->height < y || y < 0)
+        return ;
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
     *(unsigned int *)dst = color;
 }
@@ -128,13 +130,12 @@ int main(void)
 
                     if (px >= img.width || py >= img.height)
                         continue;
-
                     t_color pixel_color = vec3(0, 0, 0);
 
                     for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
                     {
                         t_ray ray = get_ray(&w.camera, px, py);
-                        t_color sample_color = ray_color(&w.camera, &ray, &w, 50);
+                        t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
                         v3_add_mut(&pixel_color, &sample_color);
                     }
                     v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);

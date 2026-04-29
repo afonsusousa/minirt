@@ -5,6 +5,8 @@
 #ifndef MINIRT_INTERVAL_H
 #define MINIRT_INTERVAL_H
 
+#include <stdbool.h>
+
 typedef struct s_interval
 {
     double min;

@@ -41,16 +41,6 @@ typedef struct s_format {
     const char   *name;
 } t_format;
 
-typedef struct s_lambertian
-{
-    t_vec3 *albedo;
-} t_lambertian;
-
-typedef struct s_metal
-{
-    t_vec3 *albedo;
-} t_metal;
-
 struct s_hit;
 struct s_material;
 

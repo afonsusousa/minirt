@@ -13,6 +13,7 @@ typedef struct s_vec3
     double x;
     double y;
     double z;
+    double pad;
 } t_vec3;
 
 typedef t_vec3 t_point;
@@ -21,9 +22,12 @@ typedef t_vec3 t_color;
 #define BASICALLY_ZERO 1e-160
 /* creation */
 
-static inline t_vec3 vec3(double x, double y, double z)
-{
-    return ((t_vec3){x, y, z});
+static inline t_vec3 vec3(double x, double y, double z) {
+    t_vec3 res = {0}; // This explicitly zeroes out the hidden padding bytes
+    res.x = x; 
+    res.y = y; 
+    res.z = z;
+    return res;
 }
 
 /* pure functions */
