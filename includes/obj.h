@@ -32,6 +32,7 @@ typedef enum e_field_type {
 typedef enum e_material_type {
     MAT_LIMBERTIAN = 1,
     MAT_METAL,
+    MAT_DIELECTRIC,
     MAT_END
 } t_material_type;
 
@@ -52,6 +53,7 @@ typedef struct s_material
     t_material_type type;
     t_vec3 color;
     double fuzz;
+    double refractive_index;
     t_scatter_func scatter;
 } __attribute__((aligned(32))) t_material;
 

@@ -82,6 +82,25 @@ static inline t_vec3 v3_reflect(t_vec3 v, t_vec3 n)
     return (v3_sub(v, scaled_n));
 }
 
+static inline double v3_dot(t_vec3 *a, t_vec3 *b);
+static inline double v3_len_sq(t_vec3 vec);
+
+static inline t_vec3 v3_refract(t_vec3 v, t_vec3 n, double ri)
+{
+    t_vec3 neg_v = v3_neg(v);
+    double cos_theta = fmin(v3_dot(&neg_v, &n), 1.0);
+    t_vec3 r_out_perp = v3_muls(v3_add(v, v3_muls(n, cos_theta)), ri);
+    t_vec3 r_out_parallel = v3_muls(n, -sqrt(fabs(1.0 - v3_len_sq(r_out_perp))));
+    return (v3_add(r_out_perp, r_out_parallel));
+}
+
+static inline double v3_reflectance(double cosine, double ref_idx)
+{
+    double r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+    r0 = r0 * r0;
+    return r0 + (1.0 - r0) * pow((1.0 - cosine), 5);
+}
+
 static inline t_vec3 v3_cross(t_vec3 a, t_vec3 b)
 {
     return (vec3(a.y * b.z - a.z * b.y,

@@ -91,7 +91,7 @@ int main(void)
 
     assign_material_scatter_funcs(&w);
 
-    init_camera(&w.camera, 1920, 16.0 / 9.0);
+    init_camera(&w.camera, 1080, 16.0 / 9.0);
     img.width = w.camera.image_width;
     img.height = w.camera.image_height;
 

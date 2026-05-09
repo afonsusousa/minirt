@@ -50,6 +50,6 @@ bool hit_sphere(t_obj *sphere, t_ray *ray, t_interval ray_t, t_hit *record)
     }
     record->t = root;
     record->p = ray_at(ray, record->t);
-    record->N = v3_unit(v3_divs(v3_sub(record->p, sphere->shape.sphere.center), sphere->shape.sphere.radius));
+    set_face_normal(record, ray, v3_unit(v3_divs(v3_sub(record->p, sphere->shape.sphere.center), sphere->shape.sphere.radius)));
     return (true);
 }

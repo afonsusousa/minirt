@@ -50,6 +50,7 @@ static bool	parse_opt_mat(t_world *wrld, void *target, char **line)
 
 	mat->type = MAT_LIMBERTIAN;
 	mat->fuzz = 0.0;
+	mat->refractive_index = 1.0;
 
 	if (!skip(line, ft_isspace) || **line == '\0' || **line == '\n')
 		return (true);
@@ -59,6 +60,15 @@ static bool	parse_opt_mat(t_world *wrld, void *target, char **line)
 		if (skip(line, ft_isspace) && **line != '\0' && **line != '\n')
 		{
 			if (!parse_double(line, &mat->fuzz))
+				return (false);
+		}
+	}
+	else if (match_id(line, "dielectric"))
+	{
+		mat->type = MAT_DIELECTRIC;
+		if (skip(line, ft_isspace) && **line != '\0' && **line != '\n')
+		{
+			if (!parse_double(line, &mat->refractive_index))
 				return (false);
 		}
 	}
