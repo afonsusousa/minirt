@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:04 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/29 19:16:35 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/11 17:32:03 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ bool scatter_dielectric(t_camera *c, t_hit *record, t_ray *scattered, t_material
     t_vec3 unit_direction = v3_unit(scattered->direction);
     t_vec3 neg_dir = v3_neg(unit_direction);
     double cos_theta = fmin(v3_dot(&neg_dir, &record->N), 1.0);
-    double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+    double sin_theta = sqrt(fmax(0.0, 1.0 - (cos_theta * cos_theta)));
 
     cannot_refract = refraction_ratio * sin_theta > 1.0;
     if(cannot_refract || v3_reflectance(cos_theta, refraction_ratio) > pcg_range_double(&c->rng, 0.0, 1.0))

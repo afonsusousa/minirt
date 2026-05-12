@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/29 19:13:59 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/12 23:16:51 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ static bool get_closest_hit(t_ray *r, t_world *world, t_hit *closest_record, t_m
     i = 0;
     while (i < world->num_objects)
     {
-        if (hit(&world->objects[i], r, (t_interval){0.001, closest_so_far}, &record))
+        t_hit_ctx ctx = {r, (t_interval){0.001, closest_so_far}, &record};
+        if (hit(&world->objects[i], &ctx))
         {
             hit_anything = true;
             closest_so_far = record.t;
@@ -58,12 +59,10 @@ t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
         return (vec3(0, 0, 0));
     if (get_closest_hit(r, world, &closest_record, &closest_mat))
     {
-        scattered.direction = r->direction;
-        unit_dir = closest_mat->color;
-        //false here is hacky af
-        v3_muls_mut(&unit_dir, 
-            0.5 + (0.5 * closest_mat->scatter(c, &closest_record, &scattered, closest_mat)));
-        return (v3_mul(ray_color(c, &scattered, world, bounce - 1), unit_dir));
+        scattered.direction = r->direction; // Required as scatter functions sometimes use it
+        if (closest_mat->scatter(c, &closest_record, &scattered, closest_mat))
+            return (v3_mul(ray_color(c, &scattered, world, bounce - 1), closest_mat->color));
+        return (vec3(0, 0, 0));
     }
     unit_dir = v3_unit(r->direction);
     a = 0.5 * (unit_dir.y + 1.0);
@@ -87,11 +86,11 @@ int main(void)
     t_data img;
     t_world w __attribute__((aligned(32)));
 
-    parse_file(&w, "exemplo2.3d");
+    parse_file(&w, "box.3d");
 
     assign_material_scatter_funcs(&w);
 
-    init_camera(&w.camera, 1080, 16.0 / 9.0);
+    init_camera(&w.camera, 1920, 16.0 / 9.0);
     img.width = w.camera.image_width;
     img.height = w.camera.image_height;
 
@@ -138,7 +137,7 @@ int main(void)
                     for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
                     {
                         t_ray ray = get_ray(&w.camera, px, py);
-                        t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
+                        t_color sample_color = ray_color(&w.camera, &ray, &w, 1000);
                         v3_add_mut(&pixel_color, &sample_color);
                     }
                     v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);

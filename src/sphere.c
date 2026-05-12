@@ -25,31 +25,26 @@
             vec3(N.x + 1.0, N.y + 1.0, N.z + 1.0),
             0.5
 */
-bool hit_sphere(t_obj *sphere, t_ray *ray, t_interval ray_t, t_hit *record)
+bool hit_sphere(t_obj *sphere, t_hit_ctx *ctx)
 {
-    t_vec3	oc;
-    double  a;
-    double  h;
-    double  c;
-    double  d;
-    double  root;
+    t_quad_calc calc;
 
-    oc = v3_sub(sphere->shape.sphere.center, ray->origin);
-    a = v3_dot(&ray->direction, &ray->direction);
-    h = v3_dot(&ray->direction, &oc);
-    c = v3_dot(&oc, &oc) - sphere->shape.sphere.radius * sphere->shape.sphere.radius;
-    d = h * h - a*c;
-    if (d < 0)
+    calc.oc = v3_sub(sphere->shape.sphere.center, ctx->ray->origin);
+    calc.a = v3_dot(&ctx->ray->direction, &ctx->ray->direction);
+    calc.half_b = v3_dot(&ctx->ray->direction, &calc.oc);
+    calc.c = v3_dot(&calc.oc, &calc.oc) - sphere->shape.sphere.radius * sphere->shape.sphere.radius;
+    calc.d = calc.half_b * calc.half_b - calc.a * calc.c;
+    if (calc.d < 0)
         return (false);
-    root = (h - sqrt(d)) / a;
-    if (!surrounds(ray_t, root))
+    calc.root = (calc.half_b - sqrt(calc.d)) / calc.a;
+    if (!surrounds(ctx->ray_t, calc.root))
     {
-        root = (h + sqrt(d)) / a;
-        if (!surrounds(ray_t, root))
+        calc.root = (calc.half_b + sqrt(calc.d)) / calc.a;
+        if (!surrounds(ctx->ray_t, calc.root))
             return (false);
     }
-    record->t = root;
-    record->p = ray_at(ray, record->t);
-    set_face_normal(record, ray, v3_unit(v3_divs(v3_sub(record->p, sphere->shape.sphere.center), sphere->shape.sphere.radius)));
+    ctx->record->t = calc.root;
+    ctx->record->p = ray_at(ctx->ray, ctx->record->t);
+    set_face_normal(ctx->record, ctx->ray, v3_unit(v3_divs(v3_sub(ctx->record->p, sphere->shape.sphere.center), sphere->shape.sphere.radius)));
     return (true);
 }

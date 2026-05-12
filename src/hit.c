@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:32 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 18:56:32 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/12 22:59:31 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,32 @@
 #include "ray.h"
 #include "stdbool.h"
 
-bool    hit(t_obj *obj, t_ray *ray, t_interval ray_t, t_hit *rec)
+bool hit(t_obj *obj, t_hit_ctx *ctx)
 {
     t_hit temp_rec;
-//    bool hit_anything;
- //   double closest_so_far;
+    t_hit_ctx temp_ctx = {ctx->ray, ctx->ray_t, &temp_rec};
 
-    //hit_anything = false;
-    //closest_so_far = ray_t.max;
     if (obj->type == OBJ_SPHERE)
     {
-        if(hit_sphere(obj, ray, ray_t, &temp_rec))
+        if (hit_sphere(obj, &temp_ctx))
         {
-  //          hit_anything = true;
-   //         closest_so_far = temp_rec.t;
-            *rec = temp_rec;
+            *(ctx->record) = temp_rec;
+            return (true);
+        }
+    }
+    else if (obj->type == OBJ_CYLINDER)
+    {
+        if (hit_cylinder(obj, &temp_ctx))
+        {
+            *(ctx->record) = temp_rec;
+            return (true);
+        }
+    }
+    else if (obj->type == OBJ_PLANE)
+    {
+        if (hit_plane(obj, &temp_ctx))
+        {
+            *(ctx->record) = temp_rec;
             return (true);
         }
     }

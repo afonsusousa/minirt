@@ -56,6 +56,10 @@ static inline t_vec3 v3_mul(t_vec3 a, t_vec3 b)
                  a.z * b.z));
 }
 
+static inline t_vec3    v3_sq(t_vec3 a) {
+    return v3_mul(a, a);
+}
+
 static inline t_vec3 v3_muls(t_vec3 vec, double t)
 {
     return (vec3(t * vec.x, t * vec.y, t * vec.z));

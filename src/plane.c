@@ -1,0 +1,31 @@
+#include "obj.h"
+#include "interval.h"
+#include "intersection.h"
+#include "vec3.h"
+#include <math.h>
+
+bool hit_plane_math(t_hit_ctx *ctx, t_vec3 center, t_vec3 normal)
+{
+    t_plane_calc calc;
+
+    calc.denom = v3_dot(&ctx->ray->direction, &normal);
+    // If ray is parallel to the plane, no intersection
+    if (fabs(calc.denom) < 1e-8)
+        return (false);
+        
+    calc.oc = v3_sub(center, ctx->ray->origin);
+    calc.t = v3_dot(&calc.oc, &normal) / calc.denom;
+    
+    if (!surrounds(ctx->ray_t, calc.t))
+        return (false);
+        
+    ctx->record->t = calc.t;
+    ctx->record->p = ray_at(ctx->ray, calc.t);
+    set_face_normal(ctx->record, ctx->ray, normal);
+    return (true);
+}
+
+bool hit_plane(t_obj *plane, t_hit_ctx *ctx)
+{
+    return (hit_plane_math(ctx, plane->shape.plane.pos, plane->shape.plane.dir));
+}
