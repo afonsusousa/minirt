@@ -22,11 +22,20 @@ typedef enum
 } t_obj_type;
 
 typedef enum e_field_type {
+    F_NVEC3,
     F_VEC3,
     F_DOUBLE,
     F_COLOR,
+    F_OPT_MAT,
     F_END
 } t_field_type;
+
+typedef enum e_material_type {
+    MAT_LIMBERTIAN = 1,
+    MAT_METAL,
+    MAT_DIELECTRIC,
+    MAT_END
+} t_material_type;
 
 typedef struct s_format {
     t_field_type type;
@@ -34,10 +43,20 @@ typedef struct s_format {
     const char   *name;
 } t_format;
 
+struct s_hit;
+struct s_material;
+struct s_camera;
+
+typedef bool (*t_scatter_func)(struct s_camera *c, struct s_hit *record, t_ray *scattered, struct s_material *mat);
+
 typedef struct s_material
 {
+    t_material_type type;
     t_vec3 color;
-} t_material;
+    double fuzz;
+    double refractive_index;
+    t_scatter_func scatter;
+} __attribute__((aligned(32))) t_material;
 
 typedef struct s_obj
 {
@@ -64,7 +83,7 @@ typedef struct s_obj
         } cylinder;
 
     } shape;
-} t_obj;
+} __attribute__((aligned(32))) t_obj;
 
 typedef struct s_camera
 {
@@ -73,20 +92,16 @@ typedef struct s_camera
     double  fov;
     
     // rendering variables
-    double  aspect_ratio;
     int     image_width;
     int     image_height;
-    double  focal_length;
-    double  viewport_height;
-    double  viewport_width;
     t_vec3  camera_center;
-    t_vec3  viewport_u;
-    t_vec3  viewport_v;
     t_vec3  pixel_delta_u;
     t_vec3  pixel_delta_v;
-    t_vec3  viewport_upper_left;
     t_vec3  pixel00_loc;
-} t_camera;
+    int     samples_per_pixel;
+    double  pixel_samples_scale;
+    t_pcg32_random rng; // random state
+} __attribute__((aligned(32))) t_camera;
 
 typedef struct s_light
 {
@@ -113,6 +128,6 @@ typedef struct s_world
     t_ambient   ambient;
     t_light     *lights;
     size_t      num_lights;
-} t_world;
+} __attribute__((aligned(32))) t_world;
 
 #endif //MINIRT_OBJ_H

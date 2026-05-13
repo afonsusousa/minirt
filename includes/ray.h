@@ -11,7 +11,7 @@ typedef struct s_ray
 {
     t_vec3  origin;
     t_vec3  direction;
-} t_ray;
+} __attribute__((aligned(32))) t_ray;
 
 static inline t_vec3 ray_at(t_ray *ray, double t)
 {
