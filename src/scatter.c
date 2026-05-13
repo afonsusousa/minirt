@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:04 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/11 17:32:03 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 14:47:55 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ bool scatter_dielectric(t_camera *c, t_hit *record, t_ray *scattered, t_material
     refraction_ratio = record->front_face
         ? (1.0 / mat->refractive_index)
         : mat->refractive_index;
-    t_vec3 unit_direction = v3_unit(scattered->direction);
+    t_vec3 unit_direction = scattered->direction;
     t_vec3 neg_dir = v3_neg(unit_direction);
     double cos_theta = fmin(v3_dot(&neg_dir, &record->N), 1.0);
     double sin_theta = sqrt(fmax(0.0, 1.0 - (cos_theta * cos_theta)));
@@ -63,15 +63,11 @@ bool scatter_dielectric(t_camera *c, t_hit *record, t_ray *scattered, t_material
 bool scatter_metal(t_camera *c, t_hit *record, t_ray *scattered, t_material *mat)
 {
     t_vec3 reflected;
-    (void)c;
 
-    reflected = v3_reflect(scattered->direction, record->N); 
-    reflected = v3_add(v3_unit(reflected),
-                       v3_muls(
-                            random_in_unit_sphere(&c->rng),
-                            mat->fuzz
-                        )
-                    );
+    reflected = v3_reflect(scattered->direction, record->N);
+    if (mat->fuzz > 0.0)
+        reflected = v3_add(reflected, v3_muls(random_in_unit_sphere(&c->rng), mat->fuzz));
+    reflected = v3_unit(reflected);
     *scattered = (t_ray){record->p, reflected};
     return (v3_dot(&scattered->direction, &record->N) > 0);
 }
@@ -93,14 +89,46 @@ void assign_material_scatter_funcs(t_world *w)
     i = 0;
     while (i < w->num_materials)
     {
-        if (w->materials[i].type == MAT_LIMBERTIAN)
-            w->materials[i].scatter = scatter_lambertian;
-        else if (w->materials[i].type == MAT_METAL)
-            w->materials[i].scatter = scatter_metal;
-        else if (w->materials[i].type == MAT_DIELECTRIC)
-            w->materials[i].scatter = scatter_dielectric;
-        else
-            w->materials[i].scatter = scatter_default;
+        switch (w->materials[i].type)
+        {
+            case MAT_LIMBERTIAN:
+                w->materials[i].scatter = scatter_lambertian;
+                break;
+            case MAT_METAL:
+                w->materials[i].scatter = scatter_metal;
+                break;
+            case MAT_DIELECTRIC:
+                w->materials[i].scatter = scatter_dielectric;
+                break;
+            default:
+                w->materials[i].scatter = scatter_default;
+                break;
+        }
         i++;
     }
 }
+
+#include "../includes/render.h"
+t_vec3 diffuse_ray_color(t_camera *c, t_ray *r, t_world *w, size_t bounce)
+{
+    t_hit       rec;
+    t_material  *mat;
+    t_ray       sc;
+    t_vec3      throughput;
+    t_vec3      ambient;
+
+    ambient = v3_muls(w->ambient.color, w->ambient.ratio);
+    throughput = vec3(1.0, 1.0, 1.0);
+    while (bounce--)
+    {
+        if (!get_closest_hit(r, w, &rec, &mat))
+            return (v3_mul(throughput, ambient));
+        sc = *r;
+        if (!mat->scatter(c, &rec, &sc, mat))
+            return (vec3(0, 0, 0));
+        throughput = v3_mul(throughput, mat->color);
+        r = &sc;
+    }
+    return (vec3(0, 0, 0));
+}
+

@@ -7,27 +7,28 @@ LIBFT_DIR := lib/libft
 LIBFT := $(LIBFT_DIR)/libft.a
 
 SRCS := \
-        $(SRC_DIR)/main.c \
-        $(SRC_DIR)/pixel.c \
-        $(SRC_DIR)/scatter.c \
-        $(SRC_DIR)/sphere.c \
-        $(SRC_DIR)/cylinder.c \
-        $(SRC_DIR)/plane.c \
-        $(SRC_DIR)/hit.c \
-        $(SRC_DIR)/vec3.c \
-        $(SRC_DIR)/parsing/parsing.c \
-        $(SRC_DIR)/parsing/parsing_init.c \
-        $(SRC_DIR)/parsing/parsing_error.c \
-        $(SRC_DIR)/parsing/parsing_utils.c \
-        $(SRC_DIR)/parsing/parsing_primitives.c \
-        $(SRC_DIR)/parsing/parsing_formats.c \
-        $(SRC_DIR)/camera.c
+	$(SRC_DIR)/main.c \
+	$(SRC_DIR)/pixel.c \
+	$(SRC_DIR)/scatter.c \
+	$(SRC_DIR)/phong.c \
+	$(SRC_DIR)/sphere.c \
+	$(SRC_DIR)/cylinder.c \
+	$(SRC_DIR)/plane.c \
+	$(SRC_DIR)/hit.c \
+	$(SRC_DIR)/vec3.c \
+	$(SRC_DIR)/parsing/parsing.c \
+	$(SRC_DIR)/parsing/parsing_init.c \
+	$(SRC_DIR)/parsing/parsing_error.c \
+	$(SRC_DIR)/parsing/parsing_utils.c \
+	$(SRC_DIR)/parsing/parsing_primitives.c \
+	$(SRC_DIR)/parsing/parsing_formats.c \
+	$(SRC_DIR)/camera.c
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
 MLX = $(MLXDIR)/libmlx.a
-MLXFLAGS = -lXext -lX11 -lm
+MLXFLAGS = -lXext -lX11
 MLXDIR = lib/minilibx-linux
 
 NAME := minirt
@@ -38,7 +39,7 @@ CFLAGS += -MMD -MP
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS) $(MLX)
-	$(CC) $(CFLAGS) $(MLXFLAGS) -o $@ $(OBJS) $(LDFLAGS) -lft $(LDLIBS) $(MLX)
+	$(CC) $(CFLAGS) $(MLXFLAGS) -o $@ $(OBJS) $(LDFLAGS) -lft $(LDLIBS) $(MLX) -lm
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)

@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:32 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/12 22:59:31 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 15:01:31 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,44 @@
 #include "obj.h"
 #include "ray.h"
 #include "stdbool.h"
+#include <math.h>
+#include "../includes/render.h"
 
 bool hit(t_obj *obj, t_hit_ctx *ctx)
 {
-    t_hit temp_rec;
-    t_hit_ctx temp_ctx = {ctx->ray, ctx->ray_t, &temp_rec};
+	switch (obj->type)
+	{
+		case OBJ_SPHERE:
+			return (hit_sphere(obj, ctx));
+		case OBJ_CYLINDER:
+			return (hit_cylinder(obj, ctx));
+		case OBJ_PLANE:
+			return (hit_plane(obj, ctx));
+		default:
+			return (false);
+	}
+}
 
-    if (obj->type == OBJ_SPHERE)
-    {
-        if (hit_sphere(obj, &temp_ctx))
-        {
-            *(ctx->record) = temp_rec;
-            return (true);
-        }
-    }
-    else if (obj->type == OBJ_CYLINDER)
-    {
-        if (hit_cylinder(obj, &temp_ctx))
-        {
-            *(ctx->record) = temp_rec;
-            return (true);
-        }
-    }
-    else if (obj->type == OBJ_PLANE)
-    {
-        if (hit_plane(obj, &temp_ctx))
-        {
-            *(ctx->record) = temp_rec;
-            return (true);
-        }
-    }
-    return (false);
+bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_material **mat)
+{
+	t_hit_ctx	ctx;
+	bool		hit_any;
+	double		closest;
+	size_t		i;
+
+	hit_any = false;
+	closest = INFINITY;
+	i = 0;
+	while (i < w->num_objects)
+	{
+		ctx = (t_hit_ctx){r, (t_interval){0.005, closest}, rec};
+		if (hit(&w->objects[i], &ctx))
+		{
+			hit_any = true;
+			closest = rec->t;
+			*mat = &w->materials[w->objects[i].mat_idx];
+		}
+		i++;
+	}
+	return (hit_any);
 }

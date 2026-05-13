@@ -85,6 +85,7 @@ t_ray get_ray(t_camera *cam, int i, int j)
 	
 	ray_origin = cam->camera_center;
 	ray_direction = v3_sub(pixel_sample, ray_origin);
+	ray_direction = v3_unit(ray_direction);
 	
 	return ((t_ray){ray_origin, ray_direction});
 }

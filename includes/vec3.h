@@ -86,7 +86,7 @@ static inline t_vec3 v3_reflect(t_vec3 v, t_vec3 n)
     return (v3_sub(v, scaled_n));
 }
 
-static inline double v3_dot(t_vec3 *a, t_vec3 *b);
+static inline double v3_dot(const t_vec3 *a, const t_vec3 *b);
 static inline double v3_len_sq(t_vec3 vec);
 
 static inline t_vec3 v3_refract(t_vec3 v, t_vec3 n, double ri)
@@ -102,7 +102,8 @@ static inline double v3_reflectance(double cosine, double ref_idx)
 {
     double r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
     r0 = r0 * r0;
-    return r0 + (1.0 - r0) * pow((1.0 - cosine), 5);
+    cosine = 1.0 - cosine;
+    return r0 + (1.0 - r0) * cosine * cosine * cosine * cosine * cosine;
 }
 
 static inline t_vec3 v3_cross(t_vec3 a, t_vec3 b)
@@ -196,11 +197,11 @@ static inline double v3_len(t_vec3 vec)
 
 static inline t_vec3 v3_unit(t_vec3 vec)
 {
-    double len = sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    double len = sqrt(v3_len_sq(vec));
     return (vec3(vec.x / len, vec.y / len, vec.z / len));
 }
 
-static inline double v3_dot(t_vec3 *a, t_vec3 *b)
+static inline double v3_dot(const t_vec3 *a, const t_vec3 *b)
 {
     return (a->x * b->x + a->y * b->y + a->z * b->z);
 }

@@ -3,7 +3,7 @@
 #include "intersection.h"
 #include "vec3.h"
 
-static void check_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap, bool *hit_anything)
+static void hit_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap, bool *hit_anything)
 {
     t_vec3      center;
     t_vec3      normal;
@@ -31,67 +31,81 @@ static void check_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap, bool *hit_a
     }
 }
 
-static bool hit_cylinder_tube(t_obj *cylinder, t_hit_ctx *ctx)
+static void setup_quad(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc)
 {
-    t_quad_calc calc;
-    double  proj;
-    t_vec3  out_normal;
+    double axis_dot_dir;
+    double axis_dot_oc;
 
-    calc.oc = v3_sub(ctx->ray->origin, cylinder->shape.cylinder.pos);
-    
-    calc.a = v3_dot(&ctx->ray->direction, &ctx->ray->direction) - pow(v3_dot(&ctx->ray->direction, &cylinder->shape.cylinder.dir), 2);
-    calc.half_b = v3_dot(&ctx->ray->direction, &calc.oc) - (v3_dot(&ctx->ray->direction, &cylinder->shape.cylinder.dir) * v3_dot(&calc.oc, &cylinder->shape.cylinder.dir));
-    calc.c = v3_dot(&calc.oc, &calc.oc) - pow(v3_dot(&calc.oc, &cylinder->shape.cylinder.dir), 2) - pow(cylinder->shape.cylinder.radius, 2);
-    
-    calc.d = calc.half_b * calc.half_b - calc.a * calc.c;
-    if (calc.d < 0)
-        return (false);
-        
-    calc.root = (-calc.half_b - sqrt(calc.d)) / calc.a;
-    if (!surrounds(ctx->ray_t, calc.root))
+    axis_dot_dir = v3_dot(&ctx->ray->direction, &cylinder->shape.cylinder.dir);
+    axis_dot_oc = v3_dot(&calc->oc, &cylinder->shape.cylinder.dir);
+    calc->a = v3_dot(&ctx->ray->direction, &ctx->ray->direction) - axis_dot_dir * axis_dot_dir;
+    calc->half_b = v3_dot(&ctx->ray->direction, &calc->oc) - (axis_dot_dir * axis_dot_oc);
+    calc->c = v3_dot(&calc->oc, &calc->oc) - axis_dot_oc * axis_dot_oc - cylinder->shape.cylinder.radius * cylinder->shape.cylinder.radius;
+}
+
+static bool hit_tube(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc, double sqrt_d)
+{
+    double root;
+    double proj;
+    t_vec3 p_minus_c;
+
+    //first root
+    root = (-calc->half_b - sqrt_d) / calc->a;
+    if (surrounds(ctx->ray_t, root))
     {
-        calc.root = (-calc.half_b + sqrt(calc.d)) / calc.a;
-        if (!surrounds(ctx->ray_t, calc.root))
-            return (false);
-    }
-    
-    ctx->record->t = calc.root;
-    ctx->record->p = ray_at(ctx->ray, ctx->record->t);
-    t_vec3 p_minus_c = v3_sub(ctx->record->p, cylinder->shape.cylinder.pos);
-    proj = v3_dot(&p_minus_c, &cylinder->shape.cylinder.dir);
-    
-    if (fabs(proj) > cylinder->shape.cylinder.height / 2.0)
-    {
-        calc.root = (-calc.half_b + sqrt(calc.d)) / calc.a;
-        if (!surrounds(ctx->ray_t, calc.root))
-            return (false);
-        ctx->record->t = calc.root;
-        ctx->record->p = ray_at(ctx->ray, ctx->record->t);
+        ctx->record->t = root;
+        ctx->record->p = ray_at(ctx->ray, root);
         p_minus_c = v3_sub(ctx->record->p, cylinder->shape.cylinder.pos);
         proj = v3_dot(&p_minus_c, &cylinder->shape.cylinder.dir);
-        if (fabs(proj) > cylinder->shape.cylinder.height / 2.0)
-            return (false);
+        if (fabs(proj) <= cylinder->shape.cylinder.height / 2.0)
+            return (true);
     }
-    out_normal = v3_unit(v3_sub(p_minus_c, v3_muls(cylinder->shape.cylinder.dir, proj)));
-    set_face_normal(ctx->record, ctx->ray, out_normal);
-    
-    return (true);
+
+    //second root
+    root = (-calc->half_b + sqrt_d) / calc->a;
+    if (surrounds(ctx->ray_t, root))
+    {
+        ctx->record->t = root;
+        ctx->record->p = ray_at(ctx->ray, root);
+        p_minus_c = v3_sub(ctx->record->p, cylinder->shape.cylinder.pos);
+        proj = v3_dot(&p_minus_c, &cylinder->shape.cylinder.dir);
+        if (fabs(proj) <= cylinder->shape.cylinder.height / 2.0)
+            return (true);
+    }
+    return (false);
 }
+
+
 
 bool hit_cylinder(t_obj *cylinder, t_hit_ctx *ctx)
 {
+    t_quad_calc calc;
+    double      sqrt_d;
+    t_vec3      p_minus_c;
+    double      proj;
     bool        hit_anything;
 
     hit_anything = false;
-
-    if (hit_cylinder_tube(cylinder, ctx))
+    
+    // check tube
+    calc.oc = v3_sub(ctx->ray->origin, cylinder->shape.cylinder.pos);
+    setup_quad(cylinder, ctx, &calc);
+    calc.d = calc.half_b * calc.half_b - calc.a * calc.c;
+    if (calc.d >= 0)
     {
-        hit_anything = true;
-        ctx->ray_t.max = ctx->record->t;
+        sqrt_d = sqrt(calc.d);
+        if (hit_tube(cylinder, ctx, &calc, sqrt_d))
+        {
+            hit_anything = true;
+            ctx->ray_t.max = ctx->record->t;
+            p_minus_c = v3_sub(ctx->record->p, cylinder->shape.cylinder.pos);
+            proj = v3_dot(&p_minus_c, &cylinder->shape.cylinder.dir);
+            set_face_normal(ctx->record, ctx->ray, v3_unit(v3_sub(p_minus_c, v3_muls(cylinder->shape.cylinder.dir, proj))));
+        }
     }
 
-    check_cap(ctx, cylinder, false, &hit_anything);
-    check_cap(ctx, cylinder, true, &hit_anything);
+    hit_cap(ctx, cylinder, false, &hit_anything);
+    hit_cap(ctx, cylinder, true, &hit_anything);
 
     return (hit_anything);
 }

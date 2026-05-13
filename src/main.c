@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/13 00:28:57 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 14:55:25 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,133 +20,83 @@
 #include "../includes/intersection.h"
 #include "../includes/interval.h"
 #include "../includes/world.h"
+#include "../includes/render.h"
 #include <stdio.h>
+#include <string.h>
 
-static bool get_closest_hit(t_ray *r, t_world *world, t_hit *closest_record, t_material **closest_mat)
+void	my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
 {
-    t_hit record;
-    bool hit_anything;
-    double closest_so_far;
-    size_t i;
+	char	*dst;
 
-    hit_anything = false;
-    closest_so_far = INFINITY;
-    i = 0;
-    while (i < world->num_objects)
-    {
-        t_hit_ctx ctx = {r, (t_interval){0.001, closest_so_far}, &record};
-        if (hit(&world->objects[i], &ctx))
-        {
-            hit_anything = true;
-            closest_so_far = record.t;
-            *closest_record = record;
-            *closest_mat = &world->materials[world->objects[i].mat_idx];
-        }
-        i++;
-    }
-    return (hit_anything);
+	if (data->height <= y || y < 0)
+		return ;
+	dst = data->addr + (y * data->line_length
+			+ x * (data->bits_per_pixel / 8));
+	*(unsigned int *)dst = color;
 }
 
-t_vec3 ray_color(t_camera *c, t_ray *r, t_world *world, size_t bounce)
+int	main(int argc, char **argv)
 {
-    t_hit closest_record;
-    t_material *closest_mat;
-    t_ray scattered;
-    t_vec3 unit_dir;
-    double a;
+	void		*mlx;
+	void		*mlx_win;
+	t_data		img;
+	t_world		w __attribute__((aligned(32)));
+	t_color		p_col;
+	t_ray		r;
+	int			cx, cy, x, y, s;
+	bool		is_pretty = false;
 
-    if (bounce <= 0)
-        return (vec3(0, 0, 0));
-    if (get_closest_hit(r, world, &closest_record, &closest_mat))
-    {
-        scattered.direction = r->direction; // Required as scatter functions sometimes use it
-        if (closest_mat->scatter(c, &closest_record, &scattered, closest_mat))
-            return (v3_mul(ray_color(c, &scattered, world, bounce - 1), closest_mat->color));
-        return (vec3(0, 0, 0));
-    }
-    unit_dir = v3_unit(r->direction);
-    a = 0.5 * (unit_dir.y + 1.0);
-    return (v3_add(v3_muls(vec3(1.0, 1.0, 1.0), 1.0 - a),
-                   v3_muls(vec3(0.5, 0.7, 1.0), a)));
-}
+	if (argc < 2)
+	{
+		printf("Usage: ./minirt <map.3d> [--pretty]\n");
+		return (1);
+	}
+	if (argc >= 3 && strcmp(argv[2], "--pretty") == 0)
+		is_pretty = true;
 
-void my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
-{
-    char *dst;
-    if (data->height < y || y < 0)
-        return ;
-    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-    *(unsigned int *)dst = color;
-}
+	parse_file(&w, argv[1]);
+	assign_material_scatter_funcs(&w);
+	init_camera(&w.camera, 1920, 16.0 / 9.0);
 
-int main(void)
-{
-    void *mlx;
-    void *mlx_win;
-    t_data img;
-    t_world w __attribute__((aligned(32)));
+	if (!is_pretty) {
+		w.camera.samples_per_pixel = 1;
+		w.camera.pixel_samples_scale = 1.0;
+	}
 
-    parse_file(&w, "exemplo2.3d");
+	img.width = w.camera.image_width;
+	img.height = w.camera.image_height;
+	mlx = mlx_init();
+	mlx_win = mlx_new_window(mlx, img.width, img.height, "Hello");
+	img.img = mlx_new_image(mlx, img.width, img.height);
+	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel,
+					&img.line_length, &img.endian);
 
-    assign_material_scatter_funcs(&w);
-
-    init_camera(&w.camera, 1920, 16.0 / 9.0);
-    img.width = w.camera.image_width;
-    img.height = w.camera.image_height;
-
-    printf("w.camera.pixel00_loc: %f %f %f\n", w.camera.pixel00_loc.x, w.camera.pixel00_loc.y, w.camera.pixel00_loc.z);
-
-    printf("w.camera.pixel00_loc: %f %f %f\n", w.camera.pixel00_loc.x, w.camera.pixel00_loc.y, w.camera.pixel00_loc.z);
-
-    mlx = mlx_init();
-    mlx_win = mlx_new_window(mlx, img.width, img.height, "Hello world!");
-    img.img = mlx_new_image(mlx, img.width, img.height);
-    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
-                                 &img.endian);
-
-    // for (int y = 0; y < img.height; y++)
-    // {
-    //     for (int x = 0; x < img.width; x++)
-    //     {
-    //         t_color pixel_color = vec3(0, 0, 0);
-    //         for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
-    //         {
-    //             t_ray ray = get_ray(&w.camera, x, y);
-    //             t_color sample_color = ray_color(&w.camera, &ray, &w, 50);
-    //             v3_add_mut(&pixel_color, &sample_color);
-    //         }
-    //         v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);
-    //         my_mlx_pixel_put(&img, x, y, color_to_int(pixel_color));
-    //     }
-    // }
-
-    for (int chunk_y = 0; chunk_y < img.height; chunk_y += 16)
-    {
-        for (int chunk_x = 0; chunk_x < img.width; chunk_x += 16)
-        {
-            for (int y = 0; y < 16; y++)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    int px = chunk_x + x;
-                    int py = chunk_y + y;
-
-                    if (px >= img.width || py >= img.height)
-                        continue;
-                    t_color pixel_color = vec3(0, 0, 0);
-                    for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
-                    {
-                        t_ray ray = get_ray(&w.camera, px, py);
-                        t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
-                        v3_add_mut(&pixel_color, &sample_color);
-                    }
-                    v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);
-                    my_mlx_pixel_put(&img, px, py, color_to_int(pixel_color));
-                }
-            }
-
-            mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
-        }
-    }
-    mlx_loop(mlx);
+	for (cy = 0; cy * 16 < img.height; cy++)
+	{
+		for (cx = 0; cx * 16 < img.width; cx++)
+		{
+			for (y = 0; y < 16; y++)
+			{
+				for (x = 0; x < 16; x++)
+				{
+					if (cx * 16 + x >= img.width || cy * 16 + y >= img.height)
+						continue ;
+					p_col = vec3(0, 0, 0);
+					for (s = 0; s < w.camera.samples_per_pixel; s++)
+					{
+						r = get_ray(&w.camera, cx * 16 + x, cy * 16 + y);
+						if (is_pretty)
+							p_col = v3_add(p_col, diffuse_ray_color(&w.camera, &r, &w, 100));
+						else
+							p_col = v3_add(p_col, phong_ray_color(&r, &w));
+					}
+					p_col = v3_muls(p_col, w.camera.pixel_samples_scale);
+					my_mlx_pixel_put(&img, cx * 16 + x, cy * 16 + y, color_to_int(p_col));
+				}
+			}
+		}
+		mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+		mlx_do_sync(mlx);
+	}
+	mlx_loop(mlx);
 }

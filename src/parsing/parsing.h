@@ -18,7 +18,7 @@
 # include "../includes/obj.h"
 
 // parsing_utils.c
-size_t	magnitude(int n);
+size_t	magnitude(char *n);
 bool	ft_isspace(char c);
 bool	skip(char **s, bool (*predicate)(char));
 bool	match_id(char **line, char *id);

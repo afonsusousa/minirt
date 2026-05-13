@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:47 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 18:56:48 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 15:05:17 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,18 +54,17 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-size_t	magnitude(int n)
+size_t	magnitude(char *n)
 {
 	size_t	mag;
 
-	if (!n)
+	if (!n || !*n)
 		return (1);
+	if (*n == '+' || *n == '-')
+		n++;
 	mag = 0;
-	while (n != 0)
-	{
+	while (ft_isdigit(*n++))
 		mag++;
-		n /= 10;
-	}
 	return (mag);
 }
 
