@@ -9,8 +9,7 @@ bool hit_plane_math(t_hit_ctx *ctx, t_vec3 center, t_vec3 normal)
     t_plane_calc calc;
 
     calc.denom = v3_dot(&ctx->ray->direction, &normal);
-    // If ray is parallel to the plane, no intersection
-    if (fabs(calc.denom) < 1e-8)
+    if (fabs(calc.denom) < BASICALLY_ZERO)
         return (false);
         
     calc.oc = v3_sub(center, ctx->ray->origin);

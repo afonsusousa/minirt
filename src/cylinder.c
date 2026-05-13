@@ -7,7 +7,6 @@ static void check_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap, bool *hit_a
 {
     t_vec3      center;
     t_vec3      normal;
-    t_vec3      center_to_p;
     t_hit       temp_rec;
     t_hit_ctx   temp_ctx;
 
@@ -24,9 +23,7 @@ static void check_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap, bool *hit_a
 
     if (!hit_plane_math(&temp_ctx, center, normal))
         return ;
-
-    center_to_p = v3_sub(temp_rec.p, center);
-    if (v3_len_sq(center_to_p) <= cylinder->shape.cylinder.radius * cylinder->shape.cylinder.radius)
+    if (v3_len_sq(v3_sub(temp_rec.p, center)) <= cylinder->shape.cylinder.radius * cylinder->shape.cylinder.radius)
     {
         *hit_anything = true;
         ctx->ray_t.max = temp_rec.t;
@@ -38,7 +35,7 @@ static bool hit_cylinder_tube(t_obj *cylinder, t_hit_ctx *ctx)
 {
     t_quad_calc calc;
     double  proj;
-    t_vec3  outward_normal;
+    t_vec3  out_normal;
 
     calc.oc = v3_sub(ctx->ray->origin, cylinder->shape.cylinder.pos);
     
@@ -75,10 +72,8 @@ static bool hit_cylinder_tube(t_obj *cylinder, t_hit_ctx *ctx)
         if (fabs(proj) > cylinder->shape.cylinder.height / 2.0)
             return (false);
     }
-
-    t_vec3 proj_vec = v3_muls(cylinder->shape.cylinder.dir, proj);
-    outward_normal = v3_unit(v3_sub(p_minus_c, proj_vec));
-    set_face_normal(ctx->record, ctx->ray, outward_normal);
+    out_normal = v3_unit(v3_sub(p_minus_c, v3_muls(cylinder->shape.cylinder.dir, proj)));
+    set_face_normal(ctx->record, ctx->ray, out_normal);
     
     return (true);
 }
@@ -89,14 +84,12 @@ bool hit_cylinder(t_obj *cylinder, t_hit_ctx *ctx)
 
     hit_anything = false;
 
-    // Check Tube body intersection
     if (hit_cylinder_tube(cylinder, ctx))
     {
         hit_anything = true;
         ctx->ray_t.max = ctx->record->t;
     }
 
-    // Check Top/Bottom Cap intersection
     check_cap(ctx, cylinder, false, &hit_anything);
     check_cap(ctx, cylinder, true, &hit_anything);
 

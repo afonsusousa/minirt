@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by afonsusousa       #+#    #+#             */
-/*   Updated: 2026/04/25 18:55:13 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 00:18:36 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,9 @@ static bool	parse_format(t_world *wrld, void *target,
 		field = (char *)target + fmt[i].offset;
 		if (fmt[i].type == F_VEC3)
 			if (!skip(line, ft_isspace) || !parse_vec3_double(line, field))
+				return (false);
+		if (fmt[i].type == F_NVEC3)
+			if (!skip(line, ft_isspace) || !parse_nvec3_double(line, field))
 				return (false);
 		if (fmt[i].type == F_DOUBLE)
 			if (!skip(line, ft_isspace) || !parse_double(line, field))

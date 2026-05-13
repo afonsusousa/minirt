@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:38 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 18:56:39 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 00:20:25 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	syntax_error(const char *file, int line, const char *start, const char *c);
 
 bool	parse_double(char **line, double *d);
 bool	parse_vec3_double(char **line, t_vec3 *vec);
+bool    parse_nvec3_double(char **line, t_vec3 *vec); 
 bool	parse_vec3_uchar(char **line, t_vec3 *vec);
 
 bool    parse_line(char **line, t_world *wrld);

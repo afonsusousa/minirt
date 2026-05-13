@@ -22,6 +22,7 @@ typedef enum
 } t_obj_type;
 
 typedef enum e_field_type {
+    F_NVEC3,
     F_VEC3,
     F_DOUBLE,
     F_COLOR,

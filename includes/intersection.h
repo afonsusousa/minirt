@@ -21,7 +21,7 @@ typedef struct s_hit_ctx {
     t_ray       *ray;
     t_interval  ray_t;
     t_hit       *record;
-} t_hit_ctx;
+} __attribute__((aligned(32))) t_hit_ctx;
 
 typedef struct s_quad_calc {
     t_vec3  oc;
@@ -30,13 +30,13 @@ typedef struct s_quad_calc {
     double  c;
     double  d;
     double  root;
-} t_quad_calc;
+} __attribute__((aligned(32))) t_quad_calc;
 
 typedef struct s_plane_calc {
     double  denom;
     t_vec3  oc;
     double  t;
-} t_plane_calc;
+} __attribute__((aligned(32))) t_plane_calc;
 
 static inline void set_face_normal(t_hit *record, t_ray *ray, t_vec3 outward_normal)
 {

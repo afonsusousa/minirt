@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:51 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 18:56:52 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 00:22:51 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,5 +85,24 @@ bool    parse_vec3_double(char **line, t_vec3   *vec)
     if (!parse_double(line, &z))
         return (false);
     *vec = vec3(x, y, z);
+    return (true);
+}
+
+#include <stdio.h>
+bool    parse_nvec3_double(char **line, t_vec3 *vec) 
+{
+    t_vec3  tmp;
+    // char    *start;
+
+    // start = *line;
+    if (!parse_vec3_double(line, &tmp))
+        return (false);
+    if (v3_len(tmp) > 1.0)
+    {
+        // *line = start;
+        printf("not normalized\n"); // this shouldnt be here, we shoul return the error type instead of bool
+        // return (true);
+    }
+    *vec = v3_unit(tmp);
     return (true);
 }

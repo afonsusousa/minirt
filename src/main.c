@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/12 23:16:51 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/13 00:28:57 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int main(void)
     t_data img;
     t_world w __attribute__((aligned(32)));
 
-    parse_file(&w, "box.3d");
+    parse_file(&w, "exemplo2.3d");
 
     assign_material_scatter_funcs(&w);
 
@@ -137,7 +137,7 @@ int main(void)
                     for (int sample = 0; sample < w.camera.samples_per_pixel; sample++)
                     {
                         t_ray ray = get_ray(&w.camera, px, py);
-                        t_color sample_color = ray_color(&w.camera, &ray, &w, 1000);
+                        t_color sample_color = ray_color(&w.camera, &ray, &w, 100);
                         v3_add_mut(&pixel_color, &sample_color);
                     }
                     v3_muls_mut(&pixel_color, w.camera.pixel_samples_scale);
