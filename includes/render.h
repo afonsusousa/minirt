@@ -18,6 +18,5 @@ typedef struct s_phong_ctx
 
 bool    get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_material **mat);
 t_vec3	phong_ray_color(t_ray *r, t_world *w);
-t_vec3  diffuse_ray_color(t_camera *c, t_ray *r, t_world *w, size_t bounce);
 
 #endif

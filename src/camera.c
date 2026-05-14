@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:35 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/12 19:54:10 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/14 21:44:39 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,15 +58,6 @@ static void	set_viewport_origin(t_camera *cam, double v_w, double v_h)
 				0.5));
 }
 
-static t_vec3 sample_square(t_camera *cam)
-{
-	return vec3(
-		pcg_double(&cam->rng) - 0.5,
-		pcg_double(&cam->rng) - 0.5,
-		0
-	);
-}
-
 t_ray get_ray(t_camera *cam, int i, int j)
 {
 	t_vec3 offset;
@@ -74,7 +65,7 @@ t_ray get_ray(t_camera *cam, int i, int j)
 	t_vec3 ray_origin;
 	t_vec3 ray_direction;
 	
-	offset = sample_square(cam);
+	offset = vec3(0.0, 0.0, 0.0);
 	pixel_sample = v3_add(
 		cam->pixel00_loc,
 		v3_add(
@@ -97,9 +88,6 @@ void	init_camera(t_camera *cam, int image_width, double aspect_ratio)
 
 	cam->samples_per_pixel = 600;
 	cam->pixel_samples_scale = 1.0 / cam->samples_per_pixel;
-	cam->rng.state = 0x853c49e6748fea9bULL;
-	cam->rng.inc = 0xda3e39cb94b95bdbULL;
-
 	cam->image_width = image_width;
 	cam->image_height = (int)(cam->image_width / aspect_ratio);
 	if (cam->image_height < 1)

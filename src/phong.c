@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/13 14:55:37 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/14 21:46:59 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@
 #include "../includes/render.h"
 #include <math.h>
 
-static bool	is_in_shadow(t_world *world, t_vec3 hit_p, t_vec3 l_dir, double d)
+static bool is_in_shadow(t_world *world, t_vec3 hit_p, t_vec3 l_dir, double d)
 {
-	t_ray		s_ray;
-	t_hit		rec;
-	t_hit_ctx	ctx;
-	size_t		i;
+	t_ray s_ray;
+	t_hit rec;
+	t_hit_ctx ctx;
+	size_t i;
 
 	s_ray.origin = hit_p;
 	s_ray.direction = l_dir;
@@ -41,12 +41,36 @@ static bool	is_in_shadow(t_world *world, t_vec3 hit_p, t_vec3 l_dir, double d)
 	return (false);
 }
 
-static t_vec3	calc_direct_light(t_world *world, t_hit *record, t_ray *r, t_material *mat)
+static void sum_spec_and_diffuse(t_phong_ctx *ctx, t_hit *record, t_material *mat, t_light *light)
 {
-	t_phong_ctx	ctx;
-	t_vec3		ambient;
-	t_light		*light;
-	size_t		i;
+	double r_dot_v;
+	double spec_fac;
+	double n_dot_l;
+	t_vec3 diff;
+
+	//TODO: MATERIALS WILL BE REMOVED, REMOVE THESE HARDCODES LATER
+	ctx->ref_dir = v3_unit(v3_sub(v3_muls(record->N, 2.0 * v3_dot(&record->N, &ctx->l_dir)), ctx->l_dir));
+	ctx->shininess = (mat->type == MAT_METAL) ? 128.0 : 32.0;
+	ctx->specular_color = (mat->type == MAT_METAL) ? mat->color : vec3(1.0, 1.0, 1.0);
+	{
+		r_dot_v = fmax(0.0, v3_dot(&ctx->ref_dir, &ctx->v_dir));
+		spec_fac = pow(r_dot_v, ctx->shininess);
+		t_vec3 spec = v3_muls(v3_mul(light->color, ctx->specular_color), light->ratio * spec_fac);
+		ctx->tot = v3_add(ctx->tot, spec);
+	}
+	{
+		n_dot_l = fmax(0.0, v3_dot(&record->N, &ctx->l_dir));
+		diff = v3_muls(v3_mul(mat->color, light->color), light->ratio * n_dot_l);
+		ctx->tot = v3_add(ctx->tot, diff);
+	}
+}
+
+static t_vec3 calc_direct_light(t_world *world, t_hit *record, t_ray *r, t_material *mat)
+{
+	t_phong_ctx ctx;
+	t_vec3 ambient;
+	t_light *light;
+	size_t i;
 
 	ambient = v3_muls(world->ambient.color, world->ambient.ratio);
 	ctx.tot = v3_mul(ambient, mat->color);
@@ -59,35 +83,17 @@ static t_vec3	calc_direct_light(t_world *world, t_hit *record, t_ray *r, t_mater
 		ctx.dist = v3_len(ctx.l_dir);
 		ctx.l_dir = v3_divs(ctx.l_dir, ctx.dist);
 		if (!is_in_shadow(world, record->p, ctx.l_dir, ctx.dist))
-		{
-			// diffuse
-			{
-				double n_dot_l = fmax(0.0, v3_dot(&record->N, &ctx.l_dir));
-				t_vec3 diff = v3_muls(v3_mul(mat->color, light->color), light->ratio * n_dot_l);
-				ctx.tot = v3_add(ctx.tot, diff);
-			}
-
-			// specular
-			ctx.ref_dir = v3_unit(v3_sub(v3_muls(record->N, 2.0 * v3_dot(&record->N, &ctx.l_dir)), ctx.l_dir));
-			ctx.shininess = (mat->type == MAT_METAL) ? 128.0 : 32.0;
-			ctx.specular_color = (mat->type == MAT_METAL) ? mat->color : vec3(1.0, 1.0, 1.0);
-			{
-				double r_dot_v = fmax(0.0, v3_dot(&ctx.ref_dir, &ctx.v_dir));
-				double spec_fac = pow(r_dot_v, ctx.shininess);
-				t_vec3 spec = v3_muls(v3_mul(light->color, ctx.specular_color), light->ratio * spec_fac);
-				ctx.tot = v3_add(ctx.tot, spec);
-			}
-		}
+			sum_spec_and_diffuse(&ctx, record, mat, light);
 		i++;
 	}
 	return (ctx.tot);
 }
 
-t_vec3	phong_ray_color(t_ray *r, t_world *w)
+t_vec3 phong_ray_color(t_ray *r, t_world *w)
 {
-	t_hit		rec;
-	t_material	*mat;
-	t_vec3		direct;
+	t_hit rec;
+	t_material *mat;
+	t_vec3 direct;
 
 	if (get_closest_hit(r, w, &rec, &mat))
 	{

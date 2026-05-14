@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/13 14:55:25 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/14 21:44:56 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ int	main(int argc, char **argv)
 		is_pretty = true;
 
 	parse_file(&w, argv[1]);
-	assign_material_scatter_funcs(&w);
 	init_camera(&w.camera, 1920, 16.0 / 9.0);
 
 	if (!is_pretty) {
@@ -85,10 +84,7 @@ int	main(int argc, char **argv)
 					for (s = 0; s < w.camera.samples_per_pixel; s++)
 					{
 						r = get_ray(&w.camera, cx * 16 + x, cy * 16 + y);
-						if (is_pretty)
-							p_col = v3_add(p_col, diffuse_ray_color(&w.camera, &r, &w, 100));
-						else
-							p_col = v3_add(p_col, phong_ray_color(&r, &w));
+						p_col = v3_add(p_col, phong_ray_color(&r, &w));
 					}
 					p_col = v3_muls(p_col, w.camera.pixel_samples_scale);
 					my_mlx_pixel_put(&img, cx * 16 + x, cy * 16 + y, color_to_int(p_col));
