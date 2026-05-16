@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+         #
+#    By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/03 16:47:35 by amagno-r          #+#    #+#              #
-#    Updated: 2025/04/15 23:54:50 by amagno-r         ###   ########.fr        #
+#    Updated: 2026/05/16 18:41:53 by amagno-r         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = libft.a
 
-SRCS = 	ft_atoi.c \
+LIBFT_SRCS = 	ft_atoi.c \
 	ft_bzero.c \
 	ft_calloc.c \
 	ft_isalnum.c \
@@ -45,7 +45,24 @@ SRCS = 	ft_atoi.c \
 	ft_strtrim.c \
 	ft_substr.c \
 	ft_tolower.c \
-	ft_toupper.c 
+	ft_toupper.c
+
+GNL_SRCS = 	get_next_line.c \
+	get_next_line_utils.c
+
+PRINTF_SRCS = 	ft_printf.c \
+	ft_printf_utils_address.c \
+	ft_printf_utils.c \
+	ft_printf_utils_flags.c \
+	ft_printf_utils_putchar.c \
+	ft_printf_utils_puthex.c \
+	ft_printf_utils_putnbr.c \
+	ft_printf_utils_putn.c \
+	ft_printf_utils_puts.c \
+	ft_printf_utils_putunbr.c \
+	ft_printf_utils_strs.c
+
+SRCS = $(LIBFT_SRCS) $(GNL_SRCS) $(PRINTF_SRCS)
 
 BONUS = ft_lstadd_back_bonus.c \
 	ft_lstadd_front_bonus.c \
@@ -62,7 +79,7 @@ OBJS = $(SRCS:.c=.o)
 OBJSBONUS = $(BONUS:.c=.o)
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror  -O3 -march=native -ffast-math
 RM = rm -f
 
 all: $(NAME)

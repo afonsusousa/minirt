@@ -1,5 +1,5 @@
 CC := cc
-CFLAGS := -fPIE -Wall -Wextra -Werror -O3 -march=native -ffast-math
+CFLAGS := -fPIE -Wall -Wextra -Werror -O3 -march=native -ffast-math -g
 INCLUDES := -Iincludes -Ilib/libft -I./lib/minilibx-linux
 SRC_DIR := src
 BUILD_DIR := build

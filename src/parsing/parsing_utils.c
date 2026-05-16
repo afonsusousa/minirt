@@ -16,7 +16,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 256
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE 256
+#endif
 
 char	*get_next_line(int fd)
 {
