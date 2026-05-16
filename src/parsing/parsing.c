@@ -41,32 +41,33 @@ static bool	match_object(char **line, t_world *wrld, void **target,
 	return (true);
 }
 
-static t_parse_status	parse_format_field(void *target,
+static t_parse_status	parse_format_field(void *field,
 		const t_format *fmt, char **line)
 {
-	void			*field;
-
-	field = (char *)target + fmt->offset;
 	if (fmt->type == F_VEC3)
 	{
 		if (!skip(line, ft_isspace))
 			return (PARSE_SYNTAX_ERROR);
 		return (parse_vec3_double(line, field));
 	}
-	else if (fmt->type == F_NVEC3)
+	if (fmt->type == F_NVEC3)
 	{
 		if (!skip(line, ft_isspace))
 			return (PARSE_SYNTAX_ERROR);
 		return (parse_nvec3_double(line, field));
 	}
-	else if (fmt->type == F_DOUBLE)
+	if (fmt->type == F_DOUBLE)
 	{
 		if (!skip(line, ft_isspace))
 			return (PARSE_SYNTAX_ERROR);
 		return (parse_double(line, field));
 	}
-	else if (fmt->type == F_COLOR)
+	if (fmt->type == F_COLOR)
+	{
+		if (!skip(line, ft_isspace))
+			return (PARSE_SYNTAX_ERROR);
 		return (parse_vec3_uchar(line, field));
+	}
 	return (PARSE_SYNTAX_ERROR);
 }
 
@@ -79,7 +80,8 @@ t_parse_status	parse_format(void *target, const t_format *fmt,
 	i = -1;
 	while (fmt[++i].type != F_END)
 	{
-		status = parse_format_field(target, &fmt[i], line);
+		status = parse_format_field((char *)target + fmt[i].offset, &fmt[i],
+				line);
 		if (status != PARSE_OK)
 			return (status);
 	}
