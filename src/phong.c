@@ -58,10 +58,10 @@ static t_vec3	calc_phong_components(t_phong_ctx ctx, t_vec3 l_dir, size_t idx)
 	t_vec3	v_dir;
 	double	spec;
 
-	n_dot_l = fmax(0.0, v3_dot(&ctx.record->N, &l_dir));
+	n_dot_l = fmax(0.0, v3_dot(&ctx.record->n, &l_dir));
 	v_dir = v3_unit(v3_sub(ctx.ray->origin, ctx.record->p));
 	h_dir = v3_unit(v3_add(l_dir, v_dir));
-	spec = pow(fmax(0.0, v3_dot(&ctx.record->N, &h_dir)), SHININESS);
+	spec = pow(fmax(0.0, v3_dot(&ctx.record->n, &h_dir)), SHININESS);
 	return (v3_add(
 			v3_muls(v3_mul(ctx.obj_color, ctx.world->lights[idx].color),
 				ctx.world->lights[idx].ratio * n_dot_l),
@@ -86,7 +86,7 @@ static t_vec3	calc_direct_light(t_phong_ctx ctx)
 		l_dir = v3_unit(l_vec);
 		if (!is_in_shadow(ctx.world, ctx.record->p, l_dir, dist))
 		{
-			if (v3_dot(&ctx.record->N, &l_dir) > 0.0)
+			if (v3_dot(&ctx.record->n, &l_dir) > 0.0)
 				total = v3_add(total, calc_phong_components(ctx, l_dir, i));
 		}
 		i++;

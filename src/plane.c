@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "intersection.h"
-#include "interval.h"
-#include "obj.h"
-#include "vec3.h"
+#include "../includes/intersection.h"
+#include "../includes/interval.h"
+#include "../includes/obj.h"
+#include "../includes/vec3.h"
 #include <math.h>
 
 bool	hit_plane_math(t_hit_ctx *ctx, t_vec3 center, t_vec3 normal)
@@ -35,6 +35,6 @@ bool	hit_plane_math(t_hit_ctx *ctx, t_vec3 center, t_vec3 normal)
 
 bool	hit_plane(t_obj *plane, t_hit_ctx *ctx)
 {
-	return (hit_plane_math(ctx, plane->shape.plane.pos,
-			plane->shape.plane.dir));
+	return (hit_plane_math(ctx, plane->u_shape.s_plane.pos,
+			plane->u_shape.s_plane.dir));
 }

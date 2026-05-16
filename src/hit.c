@@ -19,13 +19,31 @@
 #include "vec3.h"
 #include <math.h>
 
+void	set_face_normal(t_hit *record, t_ray *ray,
+		t_vec3 outward_normal)
+{
+	record->front_face = v3_dot(&ray->direction, &outward_normal) < 0.0;
+	if (record->front_face)
+		record->n = outward_normal;
+	else
+		record->n = v3_neg(outward_normal);
+}
+
+t_vec3	ray_at(t_ray *ray, double t)
+{
+	t_vec3	mult;
+
+	mult = v3_muls(ray->direction, t);
+	return (v3_add(ray->origin, mult));
+}
+
 bool	hit(t_obj *obj, t_hit_ctx *ctx)
 {
 	if (obj->type == OBJ_SPHERE)
 		return (hit_sphere(obj, ctx));
-	else if (obj->type == OBJ_CYLINDER)
+	if (obj->type == OBJ_CYLINDER)
 		return (hit_cylinder(obj, ctx));
-	else if (obj->type == OBJ_PLANE)
+	if (obj->type == OBJ_PLANE)
 		return (hit_plane(obj, ctx));
 	return (false);
 }

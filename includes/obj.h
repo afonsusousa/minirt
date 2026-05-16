@@ -10,15 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIRT_OBJ_H
-# define MINIRT_OBJ_H
+#ifndef OBJ_H
+# define OBJ_H
+
 # include "ray.h"
 # include "stdbool.h"
 # include "stddef.h"
 # include "vec3.h"
 # include <stdint.h>
 
-typedef enum
+typedef enum e_obj_type
 {
 	OBJ_AMBIENT = 1,
 	OBJ_CAMERA,
@@ -27,7 +28,7 @@ typedef enum
 	OBJ_PLANE,
 	OBJ_CYLINDER,
 	ERR
-}					t_obj_type;
+}	t_obj_type;
 
 typedef enum e_field_type
 {
@@ -36,20 +37,20 @@ typedef enum e_field_type
 	F_DOUBLE,
 	F_COLOR,
 	F_END
-}					t_field_type;
+}	t_field_type;
 
 typedef struct s_format
 {
 	t_field_type	type;
 	size_t			offset;
 	const char		*name;
-}					t_format;
+}	t_format;
 
-struct s_hit;
-struct s_ray;
-struct s_world;
-struct s_material;
-struct s_camera;
+struct	s_hit;
+struct	s_ray;
+struct	s_world;
+struct	s_material;
+struct	s_camera;
 
 typedef struct s_phong_ctx
 {
@@ -70,23 +71,21 @@ typedef struct s_obj
 		{
 			t_vec3	center;
 			double	radius;
-		} sphere;
+		}	s_sphere;
 		struct
 		{
 			t_vec3	pos;
 			t_vec3	dir;
-		} plane;
-
+		}	s_plane;
 		struct
 		{
 			t_vec3	pos;
 			t_vec3	dir;
 			double	radius;
 			double	height;
-		} cylinder;
-
-	} shape;
-} __attribute__((aligned(32))) t_obj;
+		}	s_cylinder;
+	}	u_shape;
+}	t_obj;
 
 typedef struct s_camera
 {
@@ -94,7 +93,6 @@ typedef struct s_camera
 	t_vec3			dir;
 	double			fov;
 
-	// rendering variables
 	int				image_width;
 	int				image_height;
 	t_vec3			camera_center;
@@ -103,20 +101,20 @@ typedef struct s_camera
 	t_vec3			pixel00_loc;
 	int				samples_per_pixel;
 	double			pixel_samples_scale;
-} __attribute__((aligned(32))) t_camera;
+}	t_camera;
 
 typedef struct s_light
 {
 	t_vec3			pos;
 	double			ratio;
 	t_vec3			color;
-}					t_light;
+}	t_light;
 
 typedef struct s_ambient
 {
 	double			ratio;
 	t_vec3			color;
-}					t_ambient;
+}	t_ambient;
 
 typedef struct s_world
 {
@@ -129,6 +127,6 @@ typedef struct s_world
 	size_t			num_lights;
 	bool			has_camera;
 	bool			has_ambient;
-} __attribute__((aligned(32))) t_world;
+}	t_world;
 
 #endif // MINIRT_OBJ_H

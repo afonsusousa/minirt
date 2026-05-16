@@ -17,8 +17,8 @@
 const t_format	*get_sphere_fmt(void)
 {
 	static const t_format	fmt[] = {
-	{F_VEC3, offsetof(t_obj, shape.sphere.center), "pos"},
-	{F_DOUBLE, offsetof(t_obj, shape.sphere.radius), "size"},
+	{F_VEC3, offsetof(t_obj, u_shape.s_sphere.center), "pos"},
+	{F_DOUBLE, offsetof(t_obj, u_shape.s_sphere.radius), "size"},
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};
@@ -28,8 +28,8 @@ const t_format	*get_sphere_fmt(void)
 const t_format	*get_plane_fmt(void)
 {
 	static const t_format	fmt[] = {
-	{F_VEC3, offsetof(t_obj, shape.plane.pos), "pos"},
-	{F_NVEC3, offsetof(t_obj, shape.plane.dir), "dir (normalized)"},
+	{F_VEC3, offsetof(t_obj, u_shape.s_plane.pos), "pos"},
+	{F_NVEC3, offsetof(t_obj, u_shape.s_plane.dir), "dir (normalized)"},
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};
@@ -39,10 +39,10 @@ const t_format	*get_plane_fmt(void)
 const t_format	*get_cylinder_fmt(void)
 {
 	static const t_format	fmt[] = {
-	{F_VEC3, offsetof(t_obj, shape.cylinder.pos), "pos"},
-	{F_NVEC3, offsetof(t_obj, shape.cylinder.dir), "dir (normalized)"},
-	{F_DOUBLE, offsetof(t_obj, shape.cylinder.radius), "size"},
-	{F_DOUBLE, offsetof(t_obj, shape.cylinder.height), "height"},
+	{F_VEC3, offsetof(t_obj, u_shape.s_cylinder.pos), "pos"},
+	{F_NVEC3, offsetof(t_obj, u_shape.s_cylinder.dir), "dir (normalized)"},
+	{F_DOUBLE, offsetof(t_obj, u_shape.s_cylinder.radius), "size"},
+	{F_DOUBLE, offsetof(t_obj, u_shape.s_cylinder.height), "height"},
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};

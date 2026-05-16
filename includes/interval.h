@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIRT_INTERVAL_H
-# define MINIRT_INTERVAL_H
+#ifndef INTERVAL_H
+# define INTERVAL_H
 
 # include <stdbool.h>
 
@@ -45,4 +45,4 @@ static inline double	interval_clamp(t_interval interval, double x)
 	return (x);
 }
 
-#endif // MINIRT_INTERVAL_H
+#endif

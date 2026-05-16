@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIRT_VEC3_H
-# define MINIRT_VEC3_H
+#ifndef VEC3_H
+# define VEC3_H
 
 # include <math.h>
 # include <stdint.h>
@@ -60,6 +60,6 @@ t_vec3	v3_cross(t_vec3 a, t_vec3 b);
 double	v3_len(t_vec3 vec);
 t_vec3	v3_unit(t_vec3 vec);
 void	v3_unit_mut(t_vec3 *dest);
-int	v3_near_zero(t_vec3 vec);
+int		v3_near_zero(t_vec3 vec);
 
 #endif // MINIRT_VEC3_H

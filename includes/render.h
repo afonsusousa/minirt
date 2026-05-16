@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIRT_RENDER_H
-# define MINIRT_RENDER_H
+#ifndef RENDER_H
+# define RENDER_H
 
 # include "camera.h"
 # include "intersection.h"

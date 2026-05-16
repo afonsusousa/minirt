@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIRT_MLX_MITM_H
-# define MINIRT_MLX_MITM_H
+#ifndef MLX_MITM_H
+# define MLX_MITM_H
 
 typedef struct s_data
 {
@@ -26,4 +26,4 @@ typedef struct s_data
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
 
-#endif // MINIRT_MLX_MITM_H
+#endif
