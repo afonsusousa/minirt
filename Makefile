@@ -25,6 +25,7 @@ SRCS := \
 	$(SRC_DIR)/parsing/parsing_primitives.c \
 	$(SRC_DIR)/parsing/parsing_formats.c \
 	$(SRC_DIR)/parsing/parsing_formats2.c \
+	$(SRC_DIR)/parsing/parsing_helpers.c \
 	$(SRC_DIR)/camera.c
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))

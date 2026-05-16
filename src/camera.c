@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:35 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/14 21:44:39 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 20:57:01 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,14 @@ static t_vec3	get_u(t_vec3 dir)
 	return (v3_unit(v3_cross(v3_unit(dir), vup)));
 }
 
-static t_vec3	get_v(t_vec3 dir)
-{
-	return (v3_cross(get_u(dir), v3_unit(dir)));
-}
-
 static void	init_steps(t_camera *cam, double v_width, double v_height)
 {
 	t_vec3	viewport_u;
 	t_vec3	viewport_v;
 
 	viewport_u = v3_muls(get_u(cam->dir), v_width);
-	viewport_v = v3_muls(get_v(cam->dir), -v_height);
+	viewport_v = v3_muls(v3_cross(get_u(cam->dir),
+				v3_unit(cam->dir)), -v_height);
 	cam->pixel_delta_u = v3_divs(viewport_u, cam->image_width);
 	cam->pixel_delta_v = v3_divs(viewport_v, cam->image_height);
 }
@@ -45,7 +41,7 @@ static void	set_viewport_origin(t_camera *cam, double v_w, double v_h)
 	t_vec3	vp_upper_left;
 
 	vp_u = v3_muls(get_u(cam->dir), v_w);
-	vp_v = v3_muls(get_v(cam->dir), -v_h);
+	vp_v = v3_muls(v3_cross(get_u(cam->dir), v3_unit(cam->dir)), -v_h);
 	vp_upper_left = v3_sub(v3_sub(v3_add(cam->camera_center, v3_unit(cam->dir)),
 				v3_divs(vp_u, 2.0)), v3_divs(vp_v, 2.0));
 	cam->pixel00_loc = v3_add(vp_upper_left, v3_muls(v3_add(cam->pixel_delta_u,

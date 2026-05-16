@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:23:35 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:23:41 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 20:56:06 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,12 +88,24 @@ static bool	hit_tube(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc,
 	return (false);
 }
 
+static void	process_tube_hit(t_obj *cylinder, t_hit_ctx *ctx,
+		bool *hit_anything)
+{
+	t_vec3	p_minus_c;
+	double	proj;
+
+	*hit_anything = true;
+	ctx->ray_t.max = ctx->record->t;
+	p_minus_c = v3_sub(ctx->record->p, cylinder->shape.cylinder.pos);
+	proj = v3_dot(&p_minus_c, &cylinder->shape.cylinder.dir);
+	set_face_normal(ctx->record, ctx->ray, v3_unit(v3_sub(p_minus_c,
+				v3_muls(cylinder->shape.cylinder.dir, proj))));
+}
+
 bool	hit_cylinder(t_obj *cylinder, t_hit_ctx *ctx)
 {
 	t_quad_calc	calc;
 	double		sqrt_d;
-	t_vec3		p_minus_c;
-	double		proj;
 	bool		hit_anything;
 
 	hit_anything = false;
@@ -104,14 +116,7 @@ bool	hit_cylinder(t_obj *cylinder, t_hit_ctx *ctx)
 	{
 		sqrt_d = sqrt(calc.d);
 		if (hit_tube(cylinder, ctx, &calc, sqrt_d))
-		{
-			hit_anything = true;
-			ctx->ray_t.max = ctx->record->t;
-			p_minus_c = v3_sub(ctx->record->p, cylinder->shape.cylinder.pos);
-			proj = v3_dot(&p_minus_c, &cylinder->shape.cylinder.dir);
-			set_face_normal(ctx->record, ctx->ray, v3_unit(v3_sub(p_minus_c,
-						v3_muls(cylinder->shape.cylinder.dir, proj))));
-		}
+			process_tube_hit(cylinder, ctx, &hit_anything);
 	}
 	hit_cap(ctx, cylinder, false, &hit_anything);
 	hit_cap(ctx, cylinder, true, &hit_anything);

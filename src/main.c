@@ -23,16 +23,6 @@
 #include "../lib/minilibx-linux/mlx.h"
 #include <stdio.h>
 
-void	my_mlx_pixel_put(t_data *data, int x, int y, unsigned int color)
-{
-	char	*dst;
-
-	if (data->height <= y || y < 0)
-		return ;
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-	*(unsigned int *)dst = color;
-}
-
 static void	render_pixel(t_world *w, t_data *img, int px, int py)
 {
 	t_ray	r;
@@ -112,8 +102,8 @@ int	main(int argc, char **argv)
 	t_data	img;
 	void	*mlx;
 	void	*mlx_win;
+	t_world	w;
 
-	t_world w __attribute__((aligned(32)));
 	if (argc < 2)
 	{
 		printf("Usage: ./minirt <map.3d>\n");

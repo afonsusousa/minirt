@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by afonsusousa       #+#    #+#             */
-/*   Updated: 2026/05/16 19:25:24 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 21:01:06 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,50 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static bool	parse_color_field(t_world *wrld, void *target, const t_format *fmt,
-		char **line)
-{
-	void	*field;
-
-	(void)wrld;
-	field = (char *)target + fmt->offset;
-	if (!skip(line, ft_isspace))
-		return (false);
-	if (!parse_vec3_uchar(line, (t_vec3 *)field))
-		return (false);
-	return (true);
-}
-
-static bool	parse_format_field(t_world *wrld, void *target, const t_format *fmt,
-		char **line)
-{
-	void	*field;
-
-	field = (char *)target + fmt->offset;
-	if (fmt->type == F_VEC3)
-		return (skip(line, ft_isspace) && parse_vec3_double(line, field));
-	else if (fmt->type == F_NVEC3)
-		return (skip(line, ft_isspace) && parse_nvec3_double(line, field));
-	else if (fmt->type == F_DOUBLE)
-		return (skip(line, ft_isspace) && parse_double(line, field));
-	else if (fmt->type == F_COLOR)
-		return (parse_color_field(wrld, target, fmt, line));
-	return (false);
-}
-
-static bool	parse_format(t_world *wrld, void *target, const t_format *fmt,
-		char **line)
-{
-	int	i;
-
-	i = -1;
-	while (fmt[++i].type != F_END)
-	{
-		if (!parse_format_field(wrld, target, &fmt[i], line))
-			return (false);
-	}
-	return (true);
-}
+bool	parse_ambient(char **line, t_world *wrld);
+bool	parse_camera(char **line, t_world *wrld);
+bool	parse_light(char **line, t_world *wrld);
 
 static bool	match_object(char **line, t_world *wrld, void **target,
 		const t_format **fmt)
@@ -90,6 +49,37 @@ static bool	match_object(char **line, t_world *wrld, void **target,
 	return (true);
 }
 
+static bool	parse_format_field(t_world *wrld, void *target, const t_format *fmt,
+		char **line)
+{
+	void	*field;
+
+	field = (char *)target + fmt->offset;
+	if (fmt->type == F_VEC3)
+		return (skip(line, ft_isspace) && parse_vec3_double(line, field));
+	else if (fmt->type == F_NVEC3)
+		return (skip(line, ft_isspace) && parse_nvec3_double(line, field));
+	else if (fmt->type == F_DOUBLE)
+		return (skip(line, ft_isspace) && parse_double(line, field));
+	else if (fmt->type == F_COLOR)
+		return (parse_color_field(wrld, target, fmt, line));
+	return (false);
+}
+
+bool	parse_format(t_world *wrld, void *target, const t_format *fmt,
+		char **line)
+{
+	int	i;
+
+	i = -1;
+	while (fmt[++i].type != F_END)
+	{
+		if (!parse_format_field(wrld, target, &fmt[i], line))
+			return (false);
+	}
+	return (true);
+}
+
 bool	parse_line(char **line, t_world *wrld)
 {
 	void			*target;
@@ -101,27 +91,10 @@ bool	parse_line(char **line, t_world *wrld)
 	if (match_object(line, wrld, &target, &fmt))
 		return (parse_format(wrld, target, fmt, line));
 	if (match_id(line, "A"))
-	{
-		if (wrld->has_ambient)
-			return (false);
-		if (!parse_format(wrld, &wrld->ambient, get_ambient_fmt(), line))
-			return (false);
-		wrld->has_ambient = true;
-		return (true);
-	}
+		return (parse_ambient(line, wrld));
 	if (match_id(line, "C"))
-	{
-		if (wrld->has_camera)
-			return (false);
-		if (!parse_format(wrld, &wrld->camera, get_camera_fmt(), line))
-			return (false);
-		wrld->has_camera = true;
-		return (true);
-	}
+		return (parse_camera(line, wrld));
 	if (match_id(line, "L"))
-	{
-		target = &wrld->lights[wrld->num_lights++];
-		return (parse_format(wrld, target, get_light_fmt(), line));
-	}
+		return (parse_light(line, wrld));
 	return (false);
 }

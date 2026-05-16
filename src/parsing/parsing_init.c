@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:24:02 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:24:07 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 20:49:51 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,12 @@ static size_t	count_lines(char *path)
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		return (0);
-	while ((line = get_next_line(fd)))
+	line = get_next_line(fd);
+	while (line)
 	{
 		line_count++;
 		free(line);
+		line = get_next_line(fd);
 	}
 	close(fd);
 	return (line_count);

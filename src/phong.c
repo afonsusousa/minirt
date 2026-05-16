@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   phong.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:04:18 by amagno-r         ###   ########.fr       */
-/*                                                                            */
+/*	                                                                        */
+/*	                                                    :::      ::::::::   */
+/*   phong.c	                                        :+:      :+:    :+:   */
+/*	                                                +:+ +:+         +:+     */
+/*   By: amagno-r <amagno-r@student.42port.com>	 +#+  +:+       +#+        */
+/*	                                            +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/25 18:55:59 by amagno-r	      #+#    #+#             */
+/*   Updated: 2026/05/16 20:53:14 by amagno-r	     ###   ########.fr       */
+/*	                                                                        */
 /* ************************************************************************** */
 
 #include "../includes/camera.h"
@@ -51,26 +51,22 @@ static t_vec3	calc_ambient(t_phong_ctx ctx)
 			ctx.obj_color));
 }
 
-static t_vec3	calc_diffuse(t_phong_ctx ctx, t_vec3 l_dir, size_t idx)
+static t_vec3	calc_phong_components(t_phong_ctx ctx, t_vec3 l_dir, size_t idx)
 {
 	double	n_dot_l;
-
-	n_dot_l = fmax(0.0, v3_dot(&ctx.record->N, &l_dir));
-	return (v3_muls(v3_mul(ctx.obj_color, ctx.world->lights[idx].color),
-			ctx.world->lights[idx].ratio * n_dot_l));
-}
-
-static t_vec3	calc_specular(t_phong_ctx ctx, t_vec3 l_dir, size_t idx)
-{
 	t_vec3	h_dir;
 	t_vec3	v_dir;
 	double	spec;
 
+	n_dot_l = fmax(0.0, v3_dot(&ctx.record->N, &l_dir));
 	v_dir = v3_unit(v3_sub(ctx.ray->origin, ctx.record->p));
 	h_dir = v3_unit(v3_add(l_dir, v_dir));
 	spec = pow(fmax(0.0, v3_dot(&ctx.record->N, &h_dir)), SHININESS);
-	return (v3_muls(ctx.world->lights[idx].color, ctx.world->lights[idx].ratio
-			* SPEC_INTENSITY * spec));
+	return (v3_add(
+			v3_muls(v3_mul(ctx.obj_color, ctx.world->lights[idx].color),
+				ctx.world->lights[idx].ratio * n_dot_l),
+			v3_muls(ctx.world->lights[idx].color,
+				ctx.world->lights[idx].ratio * SPEC_INTENSITY * spec)));
 }
 
 static t_vec3	calc_direct_light(t_phong_ctx ctx)
@@ -91,10 +87,7 @@ static t_vec3	calc_direct_light(t_phong_ctx ctx)
 		if (!is_in_shadow(ctx.world, ctx.record->p, l_dir, dist))
 		{
 			if (v3_dot(&ctx.record->N, &l_dir) > 0.0)
-			{
-				total = v3_add(total, calc_diffuse(ctx, l_dir, i));
-				total = v3_add(total, calc_specular(ctx, l_dir, i));
-			}
+				total = v3_add(total, calc_phong_components(ctx, l_dir, i));
 		}
 		i++;
 	}
