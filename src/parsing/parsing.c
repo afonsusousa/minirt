@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by afonsusousa       #+#    #+#             */
-/*   Updated: 2026/05/13 00:18:36 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 19:25:24 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,93 +21,49 @@
 #include <stdio.h>
 
 static bool	parse_color_field(t_world *wrld, void *target,
-				const t_format *fmt, char **line)
+		const t_format *fmt, char **line)
 {
 	void	*field;
 
-	if (fmt->offset == 0)
-	{
-		if (!skip(line, ft_isspace) || !parse_vec3_uchar(line,
-				&wrld->materials[wrld->num_materials].color))
-			return (false);
-		((t_obj *)target)->mat_idx = wrld->num_materials++;
-	}
-	else
-	{
-		field = (char *)target + fmt->offset;
-		if (!skip(line, ft_isspace) || !parse_vec3_uchar(line, (t_vec3 *)field))
-			return (false);
-	}
-	return (true);
-}
-
-// defaulst to LAMBERTIAN
-static bool	parse_opt_mat(t_world *wrld, void *target, char **line)
-{
-	t_obj *obj = (t_obj *)target;
-	size_t mat_id = obj->mat_idx;
-	t_material *mat = &wrld->materials[mat_id];
-
-	mat->type = MAT_LIMBERTIAN;
-	mat->fuzz = 0.0;
-	mat->refractive_index = 1.0;
-
-	if (!skip(line, ft_isspace) || **line == '\0' || **line == '\n')
-		return (true);
-	if (match_id(line, "metal"))
-	{
-		mat->type = MAT_METAL;
-		if (skip(line, ft_isspace) && **line != '\0' && **line != '\n')
-		{
-			if (!parse_double(line, &mat->fuzz))
-				return (false);
-		}
-	}
-	else if (match_id(line, "dielectric"))
-	{
-		mat->type = MAT_DIELECTRIC;
-		if (skip(line, ft_isspace) && **line != '\0' && **line != '\n')
-		{
-			if (!parse_double(line, &mat->refractive_index))
-				return (false);
-		}
-	}
-	else if (match_id(line, "lambertian"))
-		mat->type = MAT_LIMBERTIAN;
-	else
+	(void)	wrld;
+	field = (char *)target + fmt->offset;
+	if (!skip(line, ft_isspace))
+		return (false);
+	if (!parse_vec3_uchar(line, (t_vec3 *)field))
 		return (false);
 	return (true);
 }
 
-static bool	parse_format(t_world *wrld, void *target,
-				const t_format *fmt, char **line)
+static bool	parse_format_field(t_world *wrld, void *target,
+			const t_format *fmt, char **line)
 {
-	int		i;
 	void	*field;
+
+	field = (char *)target + fmt->offset;
+	if (fmt->type == F_VEC3)
+		return (skip(line, ft_isspace) && \
+			parse_vec3_double(line, field));
+	else if (fmt->type == F_NVEC3)
+		return (skip(line, ft_isspace) && \
+			parse_nvec3_double(line, field));
+	else if (fmt->type == F_DOUBLE)
+		return (skip(line, ft_isspace) && \
+			parse_double(line, field));
+	else if (fmt->type == F_COLOR)
+		return (parse_color_field(wrld, target, fmt, line));
+	return (false);
+}
+
+static bool	parse_format(t_world *wrld, void *target,
+			const t_format *fmt, char **line)
+{
+	int	i;
 
 	i = -1;
 	while (fmt[++i].type != F_END)
 	{
-		if (fmt[i].type == F_OPT_MAT)
-		{
-			if (!parse_opt_mat(wrld, target, line))
-				return (false);
-			continue;
-		}
-
-		field = (char *)target + fmt[i].offset;
-		if (fmt[i].type == F_VEC3)
-			if (!skip(line, ft_isspace) || !parse_vec3_double(line, field))
-				return (false);
-		if (fmt[i].type == F_NVEC3)
-			if (!skip(line, ft_isspace) || !parse_nvec3_double(line, field))
-				return (false);
-		if (fmt[i].type == F_DOUBLE)
-			if (!skip(line, ft_isspace) || !parse_double(line, field))
-				return (false);
-		if (fmt[i].type == F_COLOR)
-			if (!parse_color_field(wrld, target, &fmt[i], line))
-				return (false);
+		if (!parse_format_field(wrld, target, &fmt[i], line))
+			return (false);
 	}
 	return (true);
 }
@@ -148,9 +104,11 @@ bool	parse_line(char **line, t_world *wrld)
 	if (match_object(line, wrld, &target, &fmt))
 		return (parse_format(wrld, target, fmt, line));
 	if (match_id(line, "A"))
-		return (parse_format(wrld, &wrld->ambient, get_ambient_fmt(), line));
+		return (parse_format(wrld, &wrld->ambient, \
+			get_ambient_fmt(), line));
 	if (match_id(line, "C"))
-		return (parse_format(wrld, &wrld->camera, get_camera_fmt(), line));
+		return (parse_format(wrld, &wrld->camera, \
+			get_camera_fmt(), line));
 	if (match_id(line, "L"))
 	{
 		target = &wrld->lights[wrld->num_lights++];

@@ -6,34 +6,38 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:55:59 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/14 21:46:59 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 20:04:18 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/color.h"
-#include "../includes/vec3.h"
-#include "../includes/ray.h"
-#include "../includes/obj.h"
 #include "../includes/camera.h"
+#include "../includes/color.h"
 #include "../includes/intersection.h"
 #include "../includes/interval.h"
-#include "../includes/world.h"
+#include "../includes/obj.h"
+#include "../includes/ray.h"
 #include "../includes/render.h"
+#include "../includes/vec3.h"
+#include "../includes/world.h"
 #include <math.h>
 
-static bool is_in_shadow(t_world *world, t_vec3 hit_p, t_vec3 l_dir, double d)
+#define SHININESS 32.0
+#define SPEC_INTENSITY 1.0
+#define SHADOW_BIAS 0.01
+
+static bool	is_in_shadow(t_world *world, t_vec3 hit_p, t_vec3 l_dir, double d)
 {
-	t_ray s_ray;
-	t_hit rec;
-	t_hit_ctx ctx;
-	size_t i;
+	t_ray		s_ray;
+	t_hit		rec;
+	t_hit_ctx	ctx;
+	size_t		i;
 
 	s_ray.origin = hit_p;
 	s_ray.direction = l_dir;
 	i = 0;
 	while (i < world->num_objects)
 	{
-		ctx = (t_hit_ctx){&s_ray, (t_interval){0.01, d}, &rec};
+		ctx = (t_hit_ctx){&s_ray, (t_interval){SHADOW_BIAS, d}, &rec};
 		if (hit(&world->objects[i], &ctx))
 			return (true);
 		i++;
@@ -41,64 +45,75 @@ static bool is_in_shadow(t_world *world, t_vec3 hit_p, t_vec3 l_dir, double d)
 	return (false);
 }
 
-static void sum_spec_and_diffuse(t_phong_ctx *ctx, t_hit *record, t_material *mat, t_light *light)
+static t_vec3	calc_ambient(t_phong_ctx ctx)
 {
-	double r_dot_v;
-	double spec_fac;
-	double n_dot_l;
-	t_vec3 diff;
-
-	//TODO: MATERIALS WILL BE REMOVED, REMOVE THESE HARDCODES LATER
-	ctx->ref_dir = v3_unit(v3_sub(v3_muls(record->N, 2.0 * v3_dot(&record->N, &ctx->l_dir)), ctx->l_dir));
-	ctx->shininess = (mat->type == MAT_METAL) ? 128.0 : 32.0;
-	ctx->specular_color = (mat->type == MAT_METAL) ? mat->color : vec3(1.0, 1.0, 1.0);
-	{
-		r_dot_v = fmax(0.0, v3_dot(&ctx->ref_dir, &ctx->v_dir));
-		spec_fac = pow(r_dot_v, ctx->shininess);
-		t_vec3 spec = v3_muls(v3_mul(light->color, ctx->specular_color), light->ratio * spec_fac);
-		ctx->tot = v3_add(ctx->tot, spec);
-	}
-	{
-		n_dot_l = fmax(0.0, v3_dot(&record->N, &ctx->l_dir));
-		diff = v3_muls(v3_mul(mat->color, light->color), light->ratio * n_dot_l);
-		ctx->tot = v3_add(ctx->tot, diff);
-	}
+	return (v3_mul(v3_muls(ctx.world->ambient.color, \
+		ctx.world->ambient.ratio), ctx.obj_color));
 }
 
-static t_vec3 calc_direct_light(t_world *world, t_hit *record, t_ray *r, t_material *mat)
+static t_vec3	calc_diffuse(t_phong_ctx ctx, t_vec3 l_dir, size_t idx)
 {
-	t_phong_ctx ctx;
-	t_vec3 ambient;
-	t_light *light;
-	size_t i;
+	double	n_dot_l;
 
-	ambient = v3_muls(world->ambient.color, world->ambient.ratio);
-	ctx.tot = v3_mul(ambient, mat->color);
-	ctx.v_dir = v3_unit(v3_muls(r->direction, -1.0));
+	n_dot_l = fmax(0.0, v3_dot(&ctx.record->N, &l_dir));
+	return (v3_muls(v3_mul(ctx.obj_color, \
+		ctx.world->lights[idx].color), \
+		ctx.world->lights[idx].ratio * n_dot_l));
+}
+
+static t_vec3	calc_specular(t_phong_ctx ctx, t_vec3 l_dir, size_t idx)
+{
+	t_vec3	h_dir;
+	t_vec3	v_dir;
+	double	spec;
+
+	v_dir = v3_unit(v3_sub(ctx.ray->origin, ctx.record->p));
+	h_dir = v3_unit(v3_add(l_dir, v_dir));
+	spec = pow(fmax(0.0, v3_dot(&ctx.record->N, &h_dir)), SHININESS);
+	return (v3_muls(ctx.world->lights[idx].color, \
+		ctx.world->lights[idx].ratio * SPEC_INTENSITY * spec));
+}
+
+static t_vec3	calc_direct_light(t_phong_ctx ctx)
+{
+	t_vec3		total;
+	t_vec3		l_vec;
+	t_vec3		l_dir;
+	double		dist;
+	double		n_dot_l;
+	size_t		i;
+
+	total = calc_ambient(ctx);
 	i = 0;
-	while (i < world->num_lights)
+	while (i < ctx.world->num_lights)
 	{
-		light = &world->lights[i];
-		ctx.l_dir = v3_sub(light->pos, record->p);
-		ctx.dist = v3_len(ctx.l_dir);
-		ctx.l_dir = v3_divs(ctx.l_dir, ctx.dist);
-		if (!is_in_shadow(world, record->p, ctx.l_dir, ctx.dist))
-			sum_spec_and_diffuse(&ctx, record, mat, light);
+		l_vec = v3_sub(ctx.world->lights[i].pos, ctx.record->p);
+		dist = v3_len(l_vec);
+		l_dir = v3_unit(l_vec);
+		n_dot_l = v3_dot(&ctx.record->N, &l_dir);
+		if (!is_in_shadow(ctx.world, ctx.record->p, l_dir, dist))
+		{
+			if (n_dot_l > 0.0)
+			{
+				total = v3_add(total, calc_diffuse(ctx, l_dir, i));
+				total = v3_add(total, calc_specular(ctx, l_dir, i));
+			}
+		}
 		i++;
 	}
-	return (ctx.tot);
+	return (total);
 }
 
-t_vec3 phong_ray_color(t_ray *r, t_world *w)
+t_vec3	phong_ray_color(t_ray *r, t_world *w)
 {
-	t_hit rec;
-	t_material *mat;
-	t_vec3 direct;
+	t_hit	rec;
+	t_vec3	color;
+	t_phong_ctx	ctx;
 
-	if (get_closest_hit(r, w, &rec, &mat))
+	if (get_closest_hit(r, w, &rec, &color))
 	{
-		direct = calc_direct_light(w, &rec, r, mat);
-		return (direct);
+		ctx = (t_phong_ctx){w, &rec, color, r};
+		return (calc_direct_light(ctx));
 	}
 	return (v3_muls(w->ambient.color, w->ambient.ratio));
 }

@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:55 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/04/25 18:56:55 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 19:24:14 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************* */
 
@@ -24,7 +24,7 @@ static size_t	count_lines(char *path)
 {
 	int		fd;
 	size_t	line_count;
-	char		*line;
+	char	*line;
 
 	line_count = 0;
 	fd = open(path, O_RDONLY);
@@ -42,22 +42,20 @@ static size_t	count_lines(char *path)
 static bool	alloc_world(t_world *wrld, size_t line_count)
 {
 	wrld->objects = ft_calloc(line_count, sizeof(t_obj));
-	wrld->materials = ft_calloc(line_count, sizeof(t_material));
 	wrld->lights = ft_calloc(line_count, sizeof(t_light));
-	if (!wrld->objects || !wrld->materials || !wrld->lights)
+	if (!wrld->objects || !wrld->lights)
 		return (false);
 	wrld->num_objects = 0;
-	wrld->num_materials = 0;
 	wrld->num_lights = 0;
 	return (true);
 }
 
-static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count, char *path)
+static bool	parse_and_pack_lines(t_world *wrld, int fd, \
+		size_t count, char *path)
 {
-	
-	size_t			i;
-	char			*line;
-	char			*curr;
+	size_t	i;
+	char	*line;
+	char	*curr;
 
 	i = 0;
 	while (i < count)
@@ -70,7 +68,6 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count, char *path
 			free(line);
 			return (false);
 		}
-		
 		free(line);
 		i++;
 	}

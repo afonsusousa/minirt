@@ -37,7 +37,7 @@ char	*get_next_line(int fd)
 	while (1)
 	{
 		if (buffer_pos >= buffer_read)
-        {
+		{
 			buffer_read = read(fd, buffer, BUFFER_SIZE);
 			buffer_pos = 0;
 			if (buffer_read <= 0)

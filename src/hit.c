@@ -10,39 +10,41 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "vec3.h"
-#include "intersection.h"
 #include "../includes/intersection.h"
+#include "../includes/render.h"
+#include "intersection.h"
 #include "obj.h"
 #include "ray.h"
 #include "stdbool.h"
+#include "vec3.h"
 #include <math.h>
-#include "../includes/render.h"
 
-bool hit(t_obj *obj, t_hit_ctx *ctx)
+bool	hit(t_obj *obj, t_hit_ctx *ctx)
 {
 	switch (obj->type)
 	{
-		case OBJ_SPHERE:
-			return (hit_sphere(obj, ctx));
-		case OBJ_CYLINDER:
-			return (hit_cylinder(obj, ctx));
-		case OBJ_PLANE:
-			return (hit_plane(obj, ctx));
-		default:
-			return (false);
+	case OBJ_SPHERE:
+		return (hit_sphere(obj, ctx));
+	case OBJ_CYLINDER:
+		return (hit_cylinder(obj, ctx));
+	case OBJ_PLANE:
+		return (hit_plane(obj, ctx));
+	default:
+		return (false);
 	}
 }
 
-bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_material **mat)
+bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_vec3 *color)
 {
 	t_hit_ctx	ctx;
 	bool		hit_any;
 	double		closest;
 	size_t		i;
+	size_t		closest_idx;
 
 	hit_any = false;
 	closest = INFINITY;
+	closest_idx = 0;
 	i = 0;
 	while (i < w->num_objects)
 	{
@@ -51,9 +53,11 @@ bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_material **mat)
 		{
 			hit_any = true;
 			closest = rec->t;
-			*mat = &w->materials[w->objects[i].mat_idx];
+			closest_idx = i;
 		}
 		i++;
 	}
+	if (hit_any)
+		*color = w->objects[closest_idx].color;
 	return (hit_any);
 }

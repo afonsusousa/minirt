@@ -12,30 +12,22 @@
 
 typedef enum
 {
-    OBJ_AMBIENT = 1,
-    OBJ_CAMERA,
-    OBJ_LIGHT,
-    OBJ_SPHERE,
-    OBJ_PLANE,
-    OBJ_CYLINDER,
-    ERR
+	OBJ_AMBIENT = 1,
+	OBJ_CAMERA,
+	OBJ_LIGHT,
+	OBJ_SPHERE,
+	OBJ_PLANE,
+	OBJ_CYLINDER,
+	ERR
 } t_obj_type;
 
 typedef enum e_field_type {
-    F_NVEC3,
-    F_VEC3,
-    F_DOUBLE,
-    F_COLOR,
-    F_OPT_MAT,
-    F_END
+	F_NVEC3,
+	F_VEC3,
+	F_DOUBLE,
+	F_COLOR,
+	F_END
 } t_field_type;
-
-typedef enum e_material_type {
-    MAT_LIMBERTIAN = 1,
-    MAT_METAL,
-    MAT_DIELECTRIC,
-    MAT_END
-} t_material_type;
 
 typedef struct s_format {
     t_field_type type;
@@ -44,45 +36,44 @@ typedef struct s_format {
 } t_format;
 
 struct s_hit;
+struct s_ray;
+struct s_world;
 struct s_material;
 struct s_camera;
 
-typedef bool (*t_scatter_func)(struct s_camera *c, struct s_hit *record, t_ray *scattered, struct s_material *mat);
-
-typedef struct s_material
+typedef struct s_phong_ctx
 {
-    t_material_type type;
-    t_vec3 color;
-    double fuzz;
-    double refractive_index;
-    t_scatter_func scatter;
-} __attribute__((aligned(32))) t_material;
+	struct s_world	*world;
+	struct s_hit	*record;
+	t_vec3		obj_color;
+	struct s_ray	*ray;
+} t_phong_ctx;
 
 typedef struct s_obj
 {
-    t_obj_type  type;
-    uint32_t    mat_idx;
-    
-    union {
-        struct 
-        {
-            t_vec3 center;
-            double radius;
-        } sphere;
-        struct 
-        {
-            t_vec3 pos;
-            t_vec3 dir;
-        } plane;
+	t_obj_type	type;
+	t_vec3		color;
 
-        struct {
-            t_vec3 pos;
-            t_vec3 dir;
-            double radius;
-            double height;
-        } cylinder;
+	union {
+		struct
+		{
+			t_vec3	center;
+			double	radius;
+		} sphere;
+		struct
+		{
+			t_vec3	pos;
+			t_vec3	dir;
+		} plane;
 
-    } shape;
+		struct {
+			t_vec3	pos;
+			t_vec3	dir;
+			double	radius;
+			double	height;
+		} cylinder;
+
+	} shape;
 } __attribute__((aligned(32))) t_obj;
 
 typedef struct s_camera
@@ -117,16 +108,13 @@ typedef struct s_ambient
 
 typedef struct s_world
 {
-    t_obj       *objects;
-    size_t      num_objects;
-    
-    t_material  *materials;
-    size_t      num_materials;
-    
-    t_camera    camera;
-    t_ambient   ambient;
-    t_light     *lights;
-    size_t      num_lights;
+	t_obj		*objects;
+	size_t		num_objects;
+
+	t_camera	camera;
+	t_ambient	ambient;
+	t_light		*lights;
+	size_t		num_lights;
 } __attribute__((aligned(32))) t_world;
 
 #endif //MINIRT_OBJ_H
