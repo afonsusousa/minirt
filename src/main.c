@@ -12,16 +12,15 @@
 
 #include "../includes/camera.h"
 #include "../includes/color.h"
-#include "../includes/intersection.h"
-#include "../includes/interval.h"
 #include "../includes/mlx_mitm.h"
 #include "../includes/obj.h"
 #include "../includes/ray.h"
 #include "../includes/render.h"
 #include "../includes/vec3.h"
-#include "../includes/world.h"
 #include "../lib/minilibx-linux/mlx.h"
 #include <stdio.h>
+
+#include "parsing.h"
 
 static void	render_pixel(t_world *w, t_data *img, int px, int py)
 {

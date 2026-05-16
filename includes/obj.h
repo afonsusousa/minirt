@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   obj.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:29:16 by amagno-r          #+#    #+#             */
 /*   Updated: 2026/05/16 20:29:17 by amagno-r         ###   ########.fr       */
@@ -49,7 +49,6 @@ typedef struct s_format
 struct	s_hit;
 struct	s_ray;
 struct	s_world;
-struct	s_material;
 struct	s_camera;
 
 typedef struct s_phong_ctx
@@ -129,4 +128,4 @@ typedef struct s_world
 	bool			has_ambient;
 }	t_world;
 
-#endif // MINIRT_OBJ_H
+#endif

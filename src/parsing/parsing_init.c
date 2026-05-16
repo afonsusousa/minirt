@@ -3,22 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_init.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:24:02 by amagno-r          #+#    #+#             */
 /*   Updated: 2026/05/16 21:22:38 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/obj.h"
-#include "../../includes/world.h"
-#include "../../lib/libft/libft.h"
-#include "fcntl.h"
+#include <stddef.h>
+
 #include "parsing.h"
-#include "unistd.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 static size_t	count_lines(char *path)
 {
@@ -83,22 +77,21 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
 	return (true);
 }
 
-t_world	*parse_file(t_world *wrld, char *path)
+void	parse_file(t_world *wrld, char *path)
 {
 	int		fd;
 	size_t	line_count;
 
 	line_count = count_lines(path);
 	if (!line_count || !alloc_world(wrld, line_count))
-		return (NULL);
+		return ;
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
-		return (NULL);
+		return ;
 	if (!parse_and_pack_lines(wrld, fd, line_count, path))
 	{
 		close(fd);
-		return (NULL);
+		return ;
 	}
 	close(fd);
-	return (wrld);
 }

@@ -1,5 +1,5 @@
 CC := cc
-CFLAGS := -fPIE -Wall -Wextra -Werror -O3 -march=native -ffast-math -g
+CFLAGS := -fPIE -Wall -Wextra -Werror -O3 -march=native -ffast-math
 INCLUDES := -Iincludes -Ilib/libft -I./lib/minilibx-linux
 SRC_DIR := src
 BUILD_DIR := build
@@ -10,6 +10,7 @@ SRCS := \
 	$(SRC_DIR)/main.c \
 	$(SRC_DIR)/pixel.c \
 	$(SRC_DIR)/phong.c \
+	$(SRC_DIR)/phong_components.c \
 	$(SRC_DIR)/sphere.c \
 	$(SRC_DIR)/cylinder.c \
 	$(SRC_DIR)/plane.c \

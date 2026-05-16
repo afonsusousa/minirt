@@ -3,21 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   hit.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:32 by amagno-r          #+#    #+#             */
 /*   Updated: 2026/05/16 20:10:57 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/intersection.h"
 #include "../includes/render.h"
-#include "intersection.h"
-#include "obj.h"
-#include "ray.h"
-#include "stdbool.h"
-#include "vec3.h"
-#include <math.h>
 
 void	set_face_normal(t_hit *record, t_ray *ray,
 		t_vec3 outward_normal)

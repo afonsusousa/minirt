@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_formats.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:44:07 by amagno-r          #+#    #+#             */
 /*   Updated: 2026/05/16 20:44:08 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/obj.h"
 #include "parsing.h"
-#include <stddef.h>
 
 const t_format	*get_sphere_fmt(void)
 {

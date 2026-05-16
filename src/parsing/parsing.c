@@ -3,22 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by afonsusousa       #+#    #+#             */
 /*   Updated: 2026/05/16 21:25:58 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/obj.h"
-#include "../../includes/world.h"
-#include "../../lib/libft/libft.h"
-#include "fcntl.h"
 #include "parsing.h"
-#include "unistd.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 t_parse_status	parse_ambient(char **line, t_world *wrld);
 t_parse_status	parse_camera(char **line, t_world *wrld);
@@ -49,7 +41,7 @@ static bool	match_object(char **line, t_world *wrld, void **target,
 	return (true);
 }
 
-static t_parse_status	parse_format_field(t_world *wrld, void *target,
+static t_parse_status	parse_format_field(void *target,
 		const t_format *fmt, char **line)
 {
 	void			*field;
@@ -74,11 +66,11 @@ static t_parse_status	parse_format_field(t_world *wrld, void *target,
 		return (parse_double(line, field));
 	}
 	else if (fmt->type == F_COLOR)
-		return (parse_color_field(wrld, target, fmt, line));
+		return (parse_vec3_uchar(line, field));
 	return (PARSE_SYNTAX_ERROR);
 }
 
-t_parse_status	parse_format(t_world *wrld, void *target, const t_format *fmt,
+t_parse_status	parse_format(void *target, const t_format *fmt,
 		char **line)
 {
 	int				i;
@@ -87,7 +79,7 @@ t_parse_status	parse_format(t_world *wrld, void *target, const t_format *fmt,
 	i = -1;
 	while (fmt[++i].type != F_END)
 	{
-		status = parse_format_field(wrld, target, &fmt[i], line);
+		status = parse_format_field(target, &fmt[i], line);
 		if (status != PARSE_OK)
 			return (status);
 	}
@@ -103,7 +95,7 @@ t_parse_status	parse_line(char **line, t_world *wrld)
 	if (**line == '\0' || **line == '\n')
 		return (PARSE_OK);
 	if (match_object(line, wrld, &target, &fmt))
-		return (parse_format(wrld, target, fmt, line));
+		return (parse_format(target, fmt, line));
 	if (match_id(line, "A"))
 		return (parse_ambient(line, wrld));
 	if (match_id(line, "C"))

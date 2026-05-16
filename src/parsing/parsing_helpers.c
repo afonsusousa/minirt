@@ -11,8 +11,7 @@
 /* ************************************************************************** */
 
 #include "../../includes/obj.h"
-#include "../../includes/world.h"
-#include "parsing.h"
+#include "../../includes/parsing.h"
 
 t_parse_status	parse_ambient(char **line, t_world *wrld)
 {
@@ -20,7 +19,7 @@ t_parse_status	parse_ambient(char **line, t_world *wrld)
 
 	if (wrld->has_ambient)
 		return (PARSE_SYNTAX_ERROR);
-	status = parse_format(wrld, &wrld->ambient, get_ambient_fmt(), line);
+	status = parse_format(&wrld->ambient, get_ambient_fmt(), line);
 	if (status != PARSE_OK)
 		return (status);
 	wrld->has_ambient = true;
@@ -33,7 +32,7 @@ t_parse_status	parse_camera(char **line, t_world *wrld)
 
 	if (wrld->has_camera)
 		return (PARSE_SYNTAX_ERROR);
-	status = parse_format(wrld, &wrld->camera, get_camera_fmt(), line);
+	status = parse_format(&wrld->camera, get_camera_fmt(), line);
 	if (status != PARSE_OK)
 		return (status);
 	wrld->has_camera = true;
@@ -45,7 +44,7 @@ t_parse_status	parse_light(char **line, t_world *wrld)
 	void	*target;
 
 	target = &wrld->lights[wrld->num_lights++];
-	return (parse_format(wrld, target, get_light_fmt(), line));
+	return (parse_format(target, get_light_fmt(), line));
 }
 
 t_parse_status	parse_color_field(t_world *wrld, void *target,
