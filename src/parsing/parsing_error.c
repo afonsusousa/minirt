@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:57:01 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 19:25:47 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 21:22:38 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ static void	print_flags(const t_format *fmt)
 	{
 		if (fmt->type == F_VEC3)
 			printf("[%s: 0.0,0.0,0.0] ", fmt->name);
+		else if (fmt->type == F_NVEC3)
+			printf("[%s: 0.0,0.0,0.0 (normalized)] ", fmt->name);
 		else if (fmt->type == F_DOUBLE)
 			printf("[%s: 0.0] ", fmt->name);
 		else if (fmt->type == F_COLOR)

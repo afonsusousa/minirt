@@ -62,6 +62,7 @@ const t_format	*get_ambient_fmt(void)
 const t_format	*get_camera_fmt(void)
 {
 	static const t_format	fmt[] = {
+	{F_VEC3, offsetof(t_camera, pos), "pos"},
 	{F_NVEC3, offsetof(t_camera, dir), "dir (normalized)"},
 	{F_DOUBLE, offsetof(t_camera, fov), "fov"},
 	{F_END, 0, NULL}

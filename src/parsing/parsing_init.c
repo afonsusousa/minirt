@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:24:02 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:49:51 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 21:22:38 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,18 +57,23 @@ static bool	alloc_world(t_world *wrld, size_t line_count)
 static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
 		char *path)
 {
-	size_t	i;
-	char	*line;
-	char	*curr;
+	size_t			i;
+	char			*line;
+	char			*curr;
+	t_parse_status	status;
 
 	i = 0;
 	while (i < count)
 	{
 		line = get_next_line(fd);
 		curr = line;
-		if (!parse_line(&curr, wrld))
+		status = parse_line(&curr, wrld);
+		if (status != PARSE_OK)
 		{
-			syntax_error(path, i + 1, line, curr);
+			if (status == PARSE_NOT_NORMALIZED)
+				printf("%s:%zu: error: non-normalized vector\n", path, i + 1);
+			else
+				syntax_error(path, i + 1, line, curr);
 			free(line);
 			return (false);
 		}

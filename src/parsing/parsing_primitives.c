@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:51 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:50:09 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 21:31:23 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,86 +17,96 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-bool	parse_double(char **line, double *d)
+t_parse_status	parse_double(char **line, double *d)
 {
 	double	integer;
 	double	decimal;
 	char	*dstart;
 
 	if (!ft_isdigit(**line) && **line != '-' && **line != '+')
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	integer = ft_atoi((const char *)*line);
 	*line += magnitude(*line) + (integer < 0 || **line == '+' || **line == '-');
 	if (**line != '.')
 	{
 		*d = (double)integer;
-		return (true);
+		return (PARSE_OK);
 	}
 	(*line)++;
 	if (!ft_isdigit(**line))
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	dstart = *line;
 	decimal = ft_atoi((const char *)*line);
 	*d = (double)integer + (((integer < 0) * -1) + (integer >= 0)) * (decimal
 			/ pow(10.0, (double)magnitude(dstart)));
 	*line += magnitude(dstart);
-	return (true);
+	return (PARSE_OK);
 }
 
-bool	parse_vec3_uchar(char **line, t_vec3 *vec)
+t_parse_status	parse_vec3_uchar(char **line, t_vec3 *vec)
 {
 	unsigned char	x;
 	unsigned char	y;
 	unsigned char	z;
 
 	if (!ft_isdigit(**line))
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	x = ft_atoi((const char *)*line);
 	*line += magnitude(*line);
 	if (**line != ',')
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	(*line)++;
 	if (!ft_isdigit(**line))
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	y = ft_atoi((const char *)*line);
 	*line += magnitude(*line);
 	if (**line != ',')
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	(*line)++;
 	if (!ft_isdigit(**line))
-		return (false);
+		return (PARSE_SYNTAX_ERROR);
 	z = ft_atoi((const char *)*line);
 	*line += magnitude(*line);
 	*vec = vec3(x / 255.0, y / 255.0, z / 255.0);
-	return (true);
+	return (PARSE_OK);
 }
 
-bool	parse_vec3_double(char **line, t_vec3 *vec)
+t_parse_status	parse_vec3_double(char **line, t_vec3 *vec)
 {
-	double	x;
-	double	y;
-	double	z;
+	double			x;
+	double			y;
+	double			z;
+	t_parse_status	status;
 
-	if (!parse_double(line, &x) || **line != ',')
-		return (false);
+	status = parse_double(line, &x);
+	if (status != PARSE_OK)
+		return (status);
+	if (**line != ',')
+		return (PARSE_SYNTAX_ERROR);
 	(*line)++;
-	if (!parse_double(line, &y) || **line != ',')
-		return (false);
+	status = parse_double(line, &y);
+	if (status != PARSE_OK)
+		return (status);
+	if (**line != ',')
+		return (PARSE_SYNTAX_ERROR);
 	(*line)++;
-	if (!parse_double(line, &z))
-		return (false);
+	status = parse_double(line, &z);
+	if (status != PARSE_OK)
+		return (status);
 	*vec = vec3(x, y, z);
-	return (true);
+	return (PARSE_OK);
 }
 
-bool	parse_nvec3_double(char **line, t_vec3 *vec)
+t_parse_status	parse_nvec3_double(char **line, t_vec3 *vec)
 {
-	t_vec3	tmp;
+	t_vec3			tmp;
+	t_parse_status	status;
 
-	if (!parse_vec3_double(line, &tmp))
-		return (false);
+	status = parse_vec3_double(line, &tmp);
+	if (status != PARSE_OK)
+		return (status);
 	if (v3_len(tmp) > 1.0)
-		printf("not normalized\n");
+		return (PARSE_NOT_NORMALIZED);
 	*vec = v3_unit(tmp);
-	return (true);
+	return (PARSE_OK);
 }

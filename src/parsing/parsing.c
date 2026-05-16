@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by afonsusousa       #+#    #+#             */
-/*   Updated: 2026/05/16 21:01:06 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 21:25:58 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-bool	parse_ambient(char **line, t_world *wrld);
-bool	parse_camera(char **line, t_world *wrld);
-bool	parse_light(char **line, t_world *wrld);
+t_parse_status	parse_ambient(char **line, t_world *wrld);
+t_parse_status	parse_camera(char **line, t_world *wrld);
+t_parse_status	parse_light(char **line, t_world *wrld);
 
 static bool	match_object(char **line, t_world *wrld, void **target,
 		const t_format **fmt)
@@ -49,45 +49,59 @@ static bool	match_object(char **line, t_world *wrld, void **target,
 	return (true);
 }
 
-static bool	parse_format_field(t_world *wrld, void *target, const t_format *fmt,
-		char **line)
+static t_parse_status	parse_format_field(t_world *wrld, void *target,
+		const t_format *fmt, char **line)
 {
-	void	*field;
+	void			*field;
 
 	field = (char *)target + fmt->offset;
 	if (fmt->type == F_VEC3)
-		return (skip(line, ft_isspace) && parse_vec3_double(line, field));
+	{
+		if (!skip(line, ft_isspace))
+			return (PARSE_SYNTAX_ERROR);
+		return (parse_vec3_double(line, field));
+	}
 	else if (fmt->type == F_NVEC3)
-		return (skip(line, ft_isspace) && parse_nvec3_double(line, field));
+	{
+		if (!skip(line, ft_isspace))
+			return (PARSE_SYNTAX_ERROR);
+		return (parse_nvec3_double(line, field));
+	}
 	else if (fmt->type == F_DOUBLE)
-		return (skip(line, ft_isspace) && parse_double(line, field));
+	{
+		if (!skip(line, ft_isspace))
+			return (PARSE_SYNTAX_ERROR);
+		return (parse_double(line, field));
+	}
 	else if (fmt->type == F_COLOR)
 		return (parse_color_field(wrld, target, fmt, line));
-	return (false);
+	return (PARSE_SYNTAX_ERROR);
 }
 
-bool	parse_format(t_world *wrld, void *target, const t_format *fmt,
+t_parse_status	parse_format(t_world *wrld, void *target, const t_format *fmt,
 		char **line)
 {
-	int	i;
+	int				i;
+	t_parse_status	status;
 
 	i = -1;
 	while (fmt[++i].type != F_END)
 	{
-		if (!parse_format_field(wrld, target, &fmt[i], line))
-			return (false);
+		status = parse_format_field(wrld, target, &fmt[i], line);
+		if (status != PARSE_OK)
+			return (status);
 	}
-	return (true);
+	return (PARSE_OK);
 }
 
-bool	parse_line(char **line, t_world *wrld)
+t_parse_status	parse_line(char **line, t_world *wrld)
 {
 	void			*target;
 	const t_format	*fmt;
 
 	skip(line, ft_isspace);
 	if (**line == '\0' || **line == '\n')
-		return (true);
+		return (PARSE_OK);
 	if (match_object(line, wrld, &target, &fmt))
 		return (parse_format(wrld, target, fmt, line));
 	if (match_id(line, "A"))
@@ -96,5 +110,5 @@ bool	parse_line(char **line, t_world *wrld)
 		return (parse_camera(line, wrld));
 	if (match_id(line, "L"))
 		return (parse_light(line, wrld));
-	return (false);
+	return (PARSE_SYNTAX_ERROR);
 }
