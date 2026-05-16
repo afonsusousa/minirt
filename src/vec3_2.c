@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vec3.c                                             :+:      :+:    :+:   */
+/*   vec3_2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: automated <auto@local>                      +#+  +:+      
 	+#+        */
@@ -13,33 +13,30 @@
 
 #include "../includes/vec3.h"
 
-t_vec3	vec3(double x, double y, double z)
+t_vec3	v3_muls(t_vec3 vec, double t)
 {
-	t_vec3	res;
-
-	res.x = x;
-	res.y = y;
-	res.z = z;
-	res.w = 0.0;
-	return (res);
+	return (vec3(t * vec.x, t * vec.y, t * vec.z));
 }
 
-t_vec3	v3_add(t_vec3 a, t_vec3 b)
+t_vec3	v3_smul(double t, t_vec3 vec)
 {
-	return (vec3(a.x + b.x, a.y + b.y, a.z + b.z));
+	return (v3_muls(vec, t));
 }
 
-t_vec3	v3_sub(t_vec3 a, t_vec3 b)
+t_vec3	v3_divs(t_vec3 vec, double t)
 {
-	return (vec3(a.x - b.x, a.y - b.y, a.z - b.z));
+	return (vec3(vec.x / t, vec.y / t, vec.z / t));
 }
 
-t_vec3	v3_mul(t_vec3 a, t_vec3 b)
+t_vec3	v3_neg(t_vec3 vec)
 {
-	return (vec3(a.x * b.x, a.y * b.y, a.z * b.z));
+	return (vec3(-vec.x, -vec.y, -vec.z));
 }
 
-t_vec3	v3_sq(t_vec3 a)
+t_vec3	v3_reflect(t_vec3 v, t_vec3 n)
 {
-	return (v3_mul(a, a));
+	t_vec3	scaled_n;
+
+	scaled_n = v3_muls(n, 2.0 * (v.x * n.x + v.y * n.y + v.z * n.z));
+	return (v3_sub(v, scaled_n));
 }

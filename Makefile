@@ -15,12 +15,16 @@ SRCS := \
 	$(SRC_DIR)/plane.c \
 	$(SRC_DIR)/hit.c \
 	$(SRC_DIR)/vec3.c \
+	$(SRC_DIR)/vec3_2.c \
+	$(SRC_DIR)/vec3_3.c \
+	$(SRC_DIR)/vec3_4.c \
 	$(SRC_DIR)/parsing/parsing.c \
 	$(SRC_DIR)/parsing/parsing_init.c \
 	$(SRC_DIR)/parsing/parsing_error.c \
 	$(SRC_DIR)/parsing/parsing_utils.c \
 	$(SRC_DIR)/parsing/parsing_primitives.c \
 	$(SRC_DIR)/parsing/parsing_formats.c \
+	$(SRC_DIR)/parsing/parsing_formats2.c \
 	$(SRC_DIR)/camera.c
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))

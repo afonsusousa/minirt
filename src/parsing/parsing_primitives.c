@@ -91,7 +91,7 @@ bool	parse_vec3_double(char **line, t_vec3 *vec)
 
 bool	parse_nvec3_double(char **line, t_vec3 *vec)
 {
-	t_vec3 tmp;
+	t_vec3	tmp;
 
 	if (!parse_vec3_double(line, &tmp))
 		return (false);
