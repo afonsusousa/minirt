@@ -19,12 +19,12 @@ static t_vec3	get_u(t_vec3 dir)
 	vup = vec3(0, 1, 0);
 	if (fabs(dir.y) == 1.0 && dir.x == 0.0 && dir.z == 0.0)
 		vup = vec3(0, 0, 1);
-	return (v3_unit(v3_cross(vup, v3_unit(dir))));
+	return (v3_unit(v3_cross(v3_unit(dir), vup)));
 }
 
 static t_vec3	get_v(t_vec3 dir)
 {
-	return (v3_cross(v3_unit(dir), get_u(dir)));
+	return (v3_cross(get_u(dir), v3_unit(dir)));
 }
 
 static void	init_steps(t_camera *cam, double v_width, double v_height)

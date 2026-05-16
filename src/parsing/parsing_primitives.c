@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.h"
-#include "../../lib/libft/libft.h"
-#include <math.h>
 #include "../../includes/vec3.h"
+#include "../../lib/libft/libft.h"
+#include "parsing.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -26,8 +26,7 @@ bool	parse_double(char **line, double *d)
 	if (!ft_isdigit(**line) && **line != '-' && **line != '+')
 		return (false);
 	integer = ft_atoi((const char *)*line);
-	*line += magnitude(*line) + (integer < 0 || **line == '+' \
-		|| **line == '-');
+	*line += magnitude(*line) + (integer < 0 || **line == '+' || **line == '-');
 	if (**line != '.')
 	{
 		*d = (double)integer;
@@ -38,8 +37,8 @@ bool	parse_double(char **line, double *d)
 		return (false);
 	dstart = *line;
 	decimal = ft_atoi((const char *)*line);
-	*d = (double)integer + (((integer < 0) * -1) + (integer >= 0)) \
-		* (decimal / pow(10.0, (double)magnitude(dstart)));
+	*d = (double)integer + (((integer < 0) * -1) + (integer >= 0)) * (decimal
+			/ pow(10.0, (double)magnitude(dstart)));
 	*line += magnitude(dstart);
 	return (true);
 }
@@ -92,7 +91,7 @@ bool	parse_vec3_double(char **line, t_vec3 *vec)
 
 bool	parse_nvec3_double(char **line, t_vec3 *vec)
 {
-	t_vec3	tmp;
+	t_vec3 tmp;
 
 	if (!parse_vec3_double(line, &tmp))
 		return (false);

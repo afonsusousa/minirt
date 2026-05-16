@@ -12,13 +12,13 @@
 
 #include "../../includes/obj.h"
 #include "parsing.h"
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
-size_t	ft_strlen(const char *s);
-bool	skip(char **s, bool (*predicate)(char));
-bool	match_id(char **line, char *id);
-bool	ft_isspace(char c);
+size_t		ft_strlen(const char *s);
+bool		skip(char **s, bool (*predicate)(char));
+bool		match_id(char **line, char *id);
+bool		ft_isspace(char c);
 
 static void	print_flags(const t_format *fmt)
 {
@@ -38,7 +38,7 @@ static void	print_flags(const t_format *fmt)
 
 static void	print_expected_format(const char *start)
 {
-	char		*tmp;
+	char			*tmp;
 	const t_format	*fmt;
 
 	tmp = (char *)start;
@@ -62,7 +62,7 @@ static void	print_expected_format(const char *start)
 		printf("invalid object\n");
 }
 
-void	syntax_error(const char *file, int line, const char *start, \
+void	syntax_error(const char *file, int line, const char *start,
 		const char *c)
 {
 	int	offset;

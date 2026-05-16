@@ -13,8 +13,8 @@
 #ifndef PARSING_H
 # define PARSING_H
 
-# include "world.h"
 # include "../lib/libft/libft.h"
+# include "world.h"
 # include <fcntl.h>
 # include <math.h>
 # include <stdbool.h>
@@ -27,8 +27,8 @@ size_t			magnitude(char *n);
 bool			ft_isspace(char c);
 bool			skip(char **s, bool (*predicate)(char));
 bool			match_id(char **line, char *id);
-void			syntax_error(const char *file, int line, \
-				const char *start, const char *c);
+void			syntax_error(const char *file, int line, const char *start,
+					const char *c);
 t_world			*parse_file(t_world *wrld, char *path);
 bool			parse_double(char **line, double *d);
 bool			parse_vec3_double(char **line, t_vec3 *vec);

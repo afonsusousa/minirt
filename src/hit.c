@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:32 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/13 15:01:31 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/16 20:10:57 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,13 @@
 
 bool	hit(t_obj *obj, t_hit_ctx *ctx)
 {
-	switch (obj->type)
-	{
-	case OBJ_SPHERE:
+	if (obj->type == OBJ_SPHERE)
 		return (hit_sphere(obj, ctx));
-	case OBJ_CYLINDER:
+	else if (obj->type == OBJ_CYLINDER)
 		return (hit_cylinder(obj, ctx));
-	case OBJ_PLANE:
+	else if (obj->type == OBJ_PLANE)
 		return (hit_plane(obj, ctx));
-	default:
-		return (false);
-	}
+	return (false);
 }
 
 bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_vec3 *color)

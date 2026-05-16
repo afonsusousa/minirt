@@ -3,12 +3,12 @@
 //
 
 #ifndef MINIRT_OBJ_H
-#define MINIRT_OBJ_H
-#include "ray.h"
-#include "vec3.h"
-#include "stdbool.h"
-#include "stddef.h"
-#include <stdint.h>
+# define MINIRT_OBJ_H
+# include "ray.h"
+# include "stdbool.h"
+# include "stddef.h"
+# include "vec3.h"
+# include <stdint.h>
 
 typedef enum
 {
@@ -19,21 +19,23 @@ typedef enum
 	OBJ_PLANE,
 	OBJ_CYLINDER,
 	ERR
-} t_obj_type;
+}					t_obj_type;
 
-typedef enum e_field_type {
+typedef enum e_field_type
+{
 	F_NVEC3,
 	F_VEC3,
 	F_DOUBLE,
 	F_COLOR,
 	F_END
-} t_field_type;
+}					t_field_type;
 
-typedef struct s_format {
-    t_field_type type;
-    size_t       offset;
-    const char   *name;
-} t_format;
+typedef struct s_format
+{
+	t_field_type	type;
+	size_t			offset;
+	const char		*name;
+}					t_format;
 
 struct s_hit;
 struct s_ray;
@@ -45,16 +47,17 @@ typedef struct s_phong_ctx
 {
 	struct s_world	*world;
 	struct s_hit	*record;
-	t_vec3		obj_color;
+	t_vec3			obj_color;
 	struct s_ray	*ray;
-} t_phong_ctx;
+}					t_phong_ctx;
 
 typedef struct s_obj
 {
-	t_obj_type	type;
-	t_vec3		color;
+	t_obj_type		type;
+	t_vec3			color;
 
-	union {
+	union
+	{
 		struct
 		{
 			t_vec3	center;
@@ -66,7 +69,8 @@ typedef struct s_obj
 			t_vec3	dir;
 		} plane;
 
-		struct {
+		struct
+		{
 			t_vec3	pos;
 			t_vec3	dir;
 			double	radius;
@@ -78,43 +82,45 @@ typedef struct s_obj
 
 typedef struct s_camera
 {
-    t_vec3  pos;
-    t_vec3  dir;
-    double  fov;
-    
-    // rendering variables
-    int     image_width;
-    int     image_height;
-    t_vec3  camera_center;
-    t_vec3  pixel_delta_u;
-    t_vec3  pixel_delta_v;
-    t_vec3  pixel00_loc;
-    int     samples_per_pixel;
-    double  pixel_samples_scale;
+	t_vec3			pos;
+	t_vec3			dir;
+	double			fov;
+
+	// rendering variables
+	int				image_width;
+	int				image_height;
+	t_vec3			camera_center;
+	t_vec3			pixel_delta_u;
+	t_vec3			pixel_delta_v;
+	t_vec3			pixel00_loc;
+	int				samples_per_pixel;
+	double			pixel_samples_scale;
 } __attribute__((aligned(32))) t_camera;
 
 typedef struct s_light
 {
-    t_vec3 pos;
-    double ratio;
-    t_vec3 color;
-} t_light;
+	t_vec3			pos;
+	double			ratio;
+	t_vec3			color;
+}					t_light;
 
 typedef struct s_ambient
 {
-    double ratio;
-    t_vec3 color;
-} t_ambient;
+	double			ratio;
+	t_vec3			color;
+}					t_ambient;
 
 typedef struct s_world
 {
-	t_obj		*objects;
-	size_t		num_objects;
+	t_obj			*objects;
+	size_t			num_objects;
 
-	t_camera	camera;
-	t_ambient	ambient;
-	t_light		*lights;
-	size_t		num_lights;
+	t_camera		camera;
+	t_ambient		ambient;
+	t_light			*lights;
+	size_t			num_lights;
+	bool			has_camera;
+	bool			has_ambient;
 } __attribute__((aligned(32))) t_world;
 
-#endif //MINIRT_OBJ_H
+#endif // MINIRT_OBJ_H

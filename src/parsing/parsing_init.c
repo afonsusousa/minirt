@@ -10,15 +10,15 @@
 /*                                                                            */
 /* ************************************************************************* */
 
-#include "../../lib/libft/libft.h"
-#include "unistd.h"
-#include "fcntl.h"
-#include <math.h>
 #include "../../includes/obj.h"
 #include "../../includes/world.h"
+#include "../../lib/libft/libft.h"
+#include "fcntl.h"
 #include "parsing.h"
-#include <stdlib.h>
+#include "unistd.h"
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static size_t	count_lines(char *path)
 {
@@ -47,11 +47,13 @@ static bool	alloc_world(t_world *wrld, size_t line_count)
 		return (false);
 	wrld->num_objects = 0;
 	wrld->num_lights = 0;
+	wrld->has_camera = false;
+	wrld->has_ambient = false;
 	return (true);
 }
 
-static bool	parse_and_pack_lines(t_world *wrld, int fd, \
-		size_t count, char *path)
+static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
+		char *path)
 {
 	size_t	i;
 	char	*line;

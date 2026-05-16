@@ -10,22 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../lib/libft/libft.h"
-#include "unistd.h"
-#include "fcntl.h"
-#include <math.h>
 #include "../../includes/obj.h"
 #include "../../includes/world.h"
+#include "../../lib/libft/libft.h"
+#include "fcntl.h"
 #include "parsing.h"
-#include <stdlib.h>
+#include "unistd.h"
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-static bool	parse_color_field(t_world *wrld, void *target,
-		const t_format *fmt, char **line)
+static bool	parse_color_field(t_world *wrld, void *target, const t_format *fmt,
+		char **line)
 {
 	void	*field;
 
-	(void)	wrld;
+	(void)wrld;
 	field = (char *)target + fmt->offset;
 	if (!skip(line, ft_isspace))
 		return (false);
@@ -34,28 +34,25 @@ static bool	parse_color_field(t_world *wrld, void *target,
 	return (true);
 }
 
-static bool	parse_format_field(t_world *wrld, void *target,
-			const t_format *fmt, char **line)
+static bool	parse_format_field(t_world *wrld, void *target, const t_format *fmt,
+		char **line)
 {
 	void	*field;
 
 	field = (char *)target + fmt->offset;
 	if (fmt->type == F_VEC3)
-		return (skip(line, ft_isspace) && \
-			parse_vec3_double(line, field));
+		return (skip(line, ft_isspace) && parse_vec3_double(line, field));
 	else if (fmt->type == F_NVEC3)
-		return (skip(line, ft_isspace) && \
-			parse_nvec3_double(line, field));
+		return (skip(line, ft_isspace) && parse_nvec3_double(line, field));
 	else if (fmt->type == F_DOUBLE)
-		return (skip(line, ft_isspace) && \
-			parse_double(line, field));
+		return (skip(line, ft_isspace) && parse_double(line, field));
 	else if (fmt->type == F_COLOR)
 		return (parse_color_field(wrld, target, fmt, line));
 	return (false);
 }
 
-static bool	parse_format(t_world *wrld, void *target,
-			const t_format *fmt, char **line)
+static bool	parse_format(t_world *wrld, void *target, const t_format *fmt,
+		char **line)
 {
 	int	i;
 
@@ -68,8 +65,8 @@ static bool	parse_format(t_world *wrld, void *target,
 	return (true);
 }
 
-static bool	match_object(char **line, t_world *wrld,
-				void **target, const t_format **fmt)
+static bool	match_object(char **line, t_world *wrld, void **target,
+		const t_format **fmt)
 {
 	*target = &wrld->objects[wrld->num_objects];
 	if (match_id(line, "sp"))
@@ -104,11 +101,23 @@ bool	parse_line(char **line, t_world *wrld)
 	if (match_object(line, wrld, &target, &fmt))
 		return (parse_format(wrld, target, fmt, line));
 	if (match_id(line, "A"))
-		return (parse_format(wrld, &wrld->ambient, \
-			get_ambient_fmt(), line));
+	{
+		if (wrld->has_ambient)
+			return (false);
+		if (!parse_format(wrld, &wrld->ambient, get_ambient_fmt(), line))
+			return (false);
+		wrld->has_ambient = true;
+		return (true);
+	}
 	if (match_id(line, "C"))
-		return (parse_format(wrld, &wrld->camera, \
-			get_camera_fmt(), line));
+	{
+		if (wrld->has_camera)
+			return (false);
+		if (!parse_format(wrld, &wrld->camera, get_camera_fmt(), line))
+			return (false);
+		wrld->has_camera = true;
+		return (true);
+	}
 	if (match_id(line, "L"))
 	{
 		target = &wrld->lights[wrld->num_lights++];

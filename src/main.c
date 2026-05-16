@@ -110,10 +110,10 @@ static void	setup_window(t_data *img, void **mlx, void **win)
 int	main(int argc, char **argv)
 {
 	t_data	img;
-	t_world	w __attribute__((aligned(32)));
 	void	*mlx;
 	void	*mlx_win;
 
+	t_world w __attribute__((aligned(32)));
 	if (argc < 2)
 	{
 		printf("Usage: ./minirt <map.3d>\n");
