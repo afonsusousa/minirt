@@ -13,16 +13,26 @@
 #ifndef MLX_MITM_H
 # define MLX_MITM_H
 
+# include "../includes/obj.h"
+
 typedef struct s_data
 {
-	void	*img;
+	void	*img_ptr;
 	char	*addr;
 	int		height;
 	int		width;
 	int		bits_per_pixel;
 	int		line_length;
 	int		endian;
-}			t_data;
+}	t_data;
+
+typedef struct s_mlx_context
+{
+	void	*mlx;
+	void	*mlx_win;
+	t_data	img;
+	t_world	*w;
+}	t_mlx_context;
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
 

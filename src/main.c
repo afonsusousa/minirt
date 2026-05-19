@@ -19,6 +19,7 @@
 #include "../includes/vec3.h"
 #include "../lib/minilibx-linux/mlx.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "parsing.h"
 
@@ -40,80 +41,124 @@ static void	render_pixel(t_world *w, t_data *img, int px, int py)
 	my_mlx_pixel_put(img, px, py, color_to_int(p_col));
 }
 
-static void	render_chunk(t_world *w, t_data *img, int cx, int cy)
+static int	render_loop(void *arg)
 {
-	int	x;
-	int	y;
-	int	px;
-	int	py;
+	t_mlx_context	*ctx;
+	int				cx;
+	int				cy;
+	static bool		rendered = false;
 
-	y = 0;
-	while (y < 16)
-	{
-		x = 0;
-		while (x < 16)
-		{
-			px = cx * 16 + x;
-			py = cy * 16 + y;
-			if (px >= img->width || py >= img->height)
-			{
-				x++;
-				continue ;
-			}
-			render_pixel(w, img, px, py);
-			x++;
-		}
-		y++;
-	}
-}
-
-static void	render_loop(t_world *w, t_data *img, void *mlx, void *mlx_win)
-{
-	int	cx;
-	int	cy;
-
+	ctx = (t_mlx_context *)arg;
+	if (!ctx || !ctx->w || rendered)
+		return (0);
 	cy = 0;
-	while (cy * 16 < img->height)
+	while (cy < ctx->img.height)
 	{
 		cx = 0;
-		while (cx * 16 < img->width)
+		while (cx < ctx->img.width)
 		{
-			render_chunk(w, img, cx, cy);
+			render_pixel(ctx->w, &ctx->img, cx, cy);
 			cx++;
 		}
-		mlx_put_image_to_window(mlx, mlx_win, img->img, 0, 0);
-		mlx_do_sync(mlx);
 		cy++;
 	}
+	mlx_put_image_to_window(ctx->mlx, ctx->mlx_win, ctx->img.img_ptr, 0, 0);
+	rendered = true;
+	return (0);
 }
 
-static void	setup_window(t_data *img, void **mlx, void **win)
+static void	setup_window(t_mlx_context *ctx, int width, int height)
 {
-	*mlx = mlx_init();
-	*win = mlx_new_window(*mlx, img->width, img->height, "minirt");
-	img->img = mlx_new_image(*mlx, img->width, img->height);
-	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
-			&img->line_length, &img->endian);
+	ctx->mlx = mlx_init();
+	ctx->mlx_win = mlx_new_window(ctx->mlx, width, height, "minirt");
+	ctx->img.width = width;
+	ctx->img.height = height;
+	ctx->img.img_ptr = mlx_new_image(ctx->mlx, width, height);
+	ctx->img.addr = mlx_get_data_addr(ctx->img.img_ptr,
+			&ctx->img.bits_per_pixel,
+			&ctx->img.line_length,
+			&ctx->img.endian);
+}
+
+static bool	destroy_world(t_world *wrld)
+{
+	if (!wrld)
+		return (true);
+	if (wrld->objects)
+	{
+		free(wrld->objects);
+		wrld->objects = NULL;
+	}
+	if (wrld->lights)
+	{
+		free(wrld->lights);
+		wrld->lights = NULL;
+	}
+	wrld->has_ambient = false;
+	return (true);
+}
+
+int	close_window(void *arg)
+{
+	t_mlx_context	*ctx;
+
+	ctx = (t_mlx_context *)arg;
+	if (!ctx)
+		exit(1);
+	if (ctx->mlx)
+		mlx_loop_hook(ctx->mlx, NULL, NULL);
+	if (ctx->mlx && ctx->mlx_win)
+	{
+		mlx_destroy_window(ctx->mlx, ctx->mlx_win);
+		ctx->mlx_win = NULL;
+	}
+	if (ctx->mlx && ctx->img.img_ptr)
+	{
+		mlx_destroy_image(ctx->mlx, ctx->img.img_ptr);
+		ctx->img.img_ptr = NULL;
+	}
+	if (ctx->mlx)
+		mlx_destroy_display(ctx->mlx);
+	if (ctx->mlx)
+		free(ctx->mlx);
+	if (ctx->w)
+	{
+		destroy_world(ctx->w);
+		ctx->w = NULL;
+	}
+	exit(0);
+}
+
+int	handle_input(int key, void *arg)
+{
+	t_mlx_context	*ctx;
+
+	ctx = (t_mlx_context *)arg;
+	if (key == 65307 || key == 53)
+		close_window(ctx);
+	return (0);
 }
 
 int	main(int argc, char **argv)
 {
-	t_data	img;
-	void	*mlx;
-	void	*mlx_win;
-	t_world	w;
+	t_mlx_context	ctx;
+	t_world			w;
 
 	if (argc < 2)
 	{
 		printf("Usage: ./minirt <map.3d>\n");
 		return (1);
 	}
-	parse_file(&w, argv[1]);
+	w.objects = NULL;
+	w.lights = NULL;
+	if (parse_file(&w, argv[1]))
+		return (destroy_world(&w));
+	ctx.w = &w;
 	init_camera(&w.camera, 1920, 16.0 / 9.0);
-	img.width = w.camera.image_width;
-	img.height = w.camera.image_height;
-	setup_window(&img, &mlx, &mlx_win);
-	render_loop(&w, &img, mlx, mlx_win);
-	mlx_loop(mlx);
+	setup_window(&ctx, w.camera.image_width, w.camera.image_height);
+	mlx_hook(ctx.mlx_win, 2, 1L << 0, &handle_input, &ctx);
+	mlx_hook(ctx.mlx_win, 17, 1L << 0, &close_window, &ctx);
+	mlx_loop_hook(ctx.mlx, &render_loop, &ctx);
+	mlx_loop(ctx.mlx);
 	return (0);
 }

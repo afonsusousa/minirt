@@ -77,21 +77,22 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
 	return (true);
 }
 
-void	parse_file(t_world *wrld, char *path)
+int	parse_file(t_world *wrld, char *path)
 {
 	int		fd;
 	size_t	line_count;
 
 	line_count = count_lines(path);
 	if (!line_count || !alloc_world(wrld, line_count))
-		return ;
+		return (1);
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
-		return ;
+		return (1);
 	if (!parse_and_pack_lines(wrld, fd, line_count, path))
 	{
 		close(fd);
-		return ;
+		return (1);
 	}
 	close(fd);
+	return (0);
 }
