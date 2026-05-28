@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   render.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:29:01 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:29:01 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/22 18:11:23 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include "intersection.h"
 # include "obj.h"
 
-# define SHININESS 32.0
+# define SHININESS 64.0
 # define SPEC_INTENSITY 1.0
 
 bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_vec3 *color);

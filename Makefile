@@ -1,4 +1,4 @@
-CC := cc
+CC := clang
 CFLAGS := -fPIE -Wall -Wextra -Werror -O3 -march=native -ffast-math
 INCLUDES := -Iincludes -Ilib/libft -I./lib/minilibx-linux
 SRC_DIR := src

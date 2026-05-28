@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by afonsusousa       #+#    #+#             */
-/*   Updated: 2026/05/16 21:25:58 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/22 18:04:05 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,14 @@ t_parse_status	parse_line(char **line, t_world *wrld)
 	if (**line == '\0' || **line == '\n')
 		return (PARSE_OK);
 	if (match_object(line, wrld, &target, &fmt))
-		return (parse_format(target, fmt, line));
+	{
+		t_parse_status status;
+
+		status = parse_format(target, fmt, line);
+		if (status != PARSE_OK)
+			return (status);
+		return (PARSE_OK);
+	}
 	if (match_id(line, "A"))
 		return (parse_ambient(line, wrld));
 	if (match_id(line, "C"))

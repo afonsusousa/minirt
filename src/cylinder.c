@@ -6,7 +6,7 @@
 /*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:23:35 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:56:06 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/22 18:04:49 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,8 @@ static void	hit_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap,
 	temp_ctx.record = &temp_rec;
 	if (!hit_plane_math(&temp_ctx, center, normal))
 		return ;
-	if (v3_len_sq(v3_sub(temp_rec.p, center))
-		<= cylinder->u_shape.s_cylinder.radius
-		* cylinder->u_shape.s_cylinder.radius)
+	double r = cylinder->u_shape.s_cylinder.diameter / 2.0;
+	if (v3_len_sq(v3_sub(temp_rec.p, center)) <= r * r)
 	{
 		*hit_anything = true;
 		ctx->ray_t.max = temp_rec.t;
@@ -58,8 +57,8 @@ static void	setup_quad(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc)
 	calc->half_b = v3_dot(&ctx->ray->direction, &calc->oc) - (axis_dot_dir
 			* axis_dot_oc);
 	calc->c = v3_dot(&calc->oc, &calc->oc) - axis_dot_oc * axis_dot_oc
-		- cylinder->u_shape.s_cylinder.radius
-		* cylinder->u_shape.s_cylinder.radius;
+		- (cylinder->u_shape.s_cylinder.diameter / 2.0)
+		* (cylinder->u_shape.s_cylinder.diameter / 2.0);
 }
 
 static bool	hit_tube(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc,

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hit.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:32 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:10:57 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/22 17:49:40 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,14 @@
 void	set_face_normal(t_hit *record, t_ray *ray,
 		t_vec3 outward_normal)
 {
-	record->front_face = v3_dot(&ray->direction, &outward_normal) < 0.0;
+	t_vec3 unit_normal;
+
+	unit_normal = v3_unit(outward_normal);
+	record->front_face = v3_dot(&ray->direction, &unit_normal) < 0.0;
 	if (record->front_face)
-		record->n = outward_normal;
+		record->n = unit_normal;
 	else
-		record->n = v3_neg(outward_normal);
+		record->n = v3_neg(unit_normal);
 }
 
 t_vec3	ray_at(t_ray *ray, double t)
@@ -50,12 +53,12 @@ bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_vec3 *color)
 	size_t		closest_idx;
 
 	hit_any = false;
-	closest = INFINITY;
+	closest = 1e30;
 	closest_idx = 0;
 	i = 0;
 	while (i < w->num_objects)
 	{
-		ctx = (t_hit_ctx){r, (t_interval){0.005, closest}, rec};
+		ctx = (t_hit_ctx){r, (t_interval){0.001, closest}, rec};
 		if (hit(&w->objects[i], &ctx))
 		{
 			hit_any = true;

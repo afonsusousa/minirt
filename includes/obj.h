@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   obj.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 20:29:16 by amagno-r          #+#    #+#             */
-/*   Updated: 2026/05/16 20:29:17 by amagno-r         ###   ########.fr       */
+/*   Updated: 2026/05/22 18:01:08 by amagno-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ typedef struct s_obj
 		struct
 		{
 			t_vec3	center;
-			double	radius;
-		}	s_sphere;
+			double	diameter;
+		} s_sphere;
 		struct
 		{
 			t_vec3	pos;
@@ -80,7 +80,7 @@ typedef struct s_obj
 		{
 			t_vec3	pos;
 			t_vec3	dir;
-			double	radius;
+			double	diameter;
 			double	height;
 		}	s_cylinder;
 	}	u_shape;

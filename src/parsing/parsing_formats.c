@@ -16,7 +16,7 @@ const t_format	*get_sphere_fmt(void)
 {
 	static const t_format	fmt[] = {
 	{F_VEC3, offsetof(t_obj, u_shape.s_sphere.center), "pos"},
-	{F_DOUBLE, offsetof(t_obj, u_shape.s_sphere.radius), "size"},
+	{F_DOUBLE, offsetof(t_obj, u_shape.s_sphere.diameter), "diameter"},
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};
@@ -39,7 +39,7 @@ const t_format	*get_cylinder_fmt(void)
 	static const t_format	fmt[] = {
 	{F_VEC3, offsetof(t_obj, u_shape.s_cylinder.pos), "pos"},
 	{F_NVEC3, offsetof(t_obj, u_shape.s_cylinder.dir), "dir (normalized)"},
-	{F_DOUBLE, offsetof(t_obj, u_shape.s_cylinder.radius), "size"},
+	{F_DOUBLE, offsetof(t_obj, u_shape.s_cylinder.diameter), "diameter"},
 	{F_DOUBLE, offsetof(t_obj, u_shape.s_cylinder.height), "height"},
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}

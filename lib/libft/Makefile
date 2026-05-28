@@ -6,7 +6,7 @@
 #    By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/03 16:47:35 by amagno-r          #+#    #+#              #
-#    Updated: 2026/05/16 18:41:53 by amagno-r         ###   ########.fr        #
+#    Updated: 2026/05/19 20:09:34 by amagno-r         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -78,8 +78,8 @@ OBJS = $(SRCS:.c=.o)
 
 OBJSBONUS = $(BONUS:.c=.o)
 
-CC = cc
-CFLAGS = -Wall -Wextra -Werror  -O3 -march=native -ffast-math
+CC = clang
+CFLAGS = -Wall -Wextra -Werror  -O3 -march=native -ffast-math -fPIE
 RM = rm -f
 
 all: $(NAME)
