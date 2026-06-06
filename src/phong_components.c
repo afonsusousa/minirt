@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   phong_components.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 10:00:00 by amagno-r          #+#    #+#             */
 /*   Updated: 2026/05/22 18:09:28 by amagno-r         ###   ########.fr       */

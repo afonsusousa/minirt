@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_primitives.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagno-r <amagno-r@student.42port.com>     +#+  +:+       +#+        */
+/*   By: amagno-r <amagno-r@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/25 18:56:51 by amagno-r          #+#    #+#             */
 /*   Updated: 2026/05/22 18:37:51 by amagno-r         ###   ########.fr       */
