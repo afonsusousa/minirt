@@ -24,7 +24,7 @@ bool	hit_sphere(t_obj *sphere, t_hit_ctx *ctx)
 	t_quad_calc	calc;
 	double		sqrt_d;
 	t_vec3		outward_normal;
-    double      r;
+	double		r;
 
 	calc.oc = v3_sub(sphere->u_shape.s_sphere.center, ctx->ray->origin);
 	calc.a = v3_dot(&ctx->ray->direction, &ctx->ray->direction);

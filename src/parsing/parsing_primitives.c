@@ -22,7 +22,9 @@ t_parse_status	parse_double(char **line, double *d)
 	double	integer;
 	double	decimal;
 	char	*dstart;
+	int		sign;
 
+	sign = 1 - ((**line == '-') * 2);
 	if (!ft_isdigit(**line) && **line != '-' && **line != '+')
 		return (PARSE_SYNTAX_ERROR);
 	integer = ft_atoi((const char *)*line);
@@ -37,8 +39,8 @@ t_parse_status	parse_double(char **line, double *d)
 		return (PARSE_SYNTAX_ERROR);
 	dstart = *line;
 	decimal = ft_atoi((const char *)*line);
-	*d = (double)integer + (((integer < 0) * -1) + (integer >= 0)) * (decimal
-			/ pow(10.0, (double)magnitude(dstart)));
+	*d = sign * (fabs((double)integer)
+			+ (decimal / pow(10.0, (double)magnitude(dstart))));
 	*line += magnitude(dstart);
 	return (PARSE_OK);
 }

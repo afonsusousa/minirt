@@ -8,6 +8,7 @@ LIBFT := $(LIBFT_DIR)/libft.a
 
 SRCS := \
 	$(SRC_DIR)/main.c \
+	$(SRC_DIR)/world.c \
 	$(SRC_DIR)/pixel.c \
 	$(SRC_DIR)/phong.c \
 	$(SRC_DIR)/phong_components.c \

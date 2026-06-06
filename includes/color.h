@@ -25,7 +25,7 @@ static inline unsigned int	create_trgb(unsigned char t, unsigned char r,
 static inline double	linear_component(double c)
 {
 	if (c > 0)
-		return (sqrt(c));
+		return (c);
 	return (0);
 }
 

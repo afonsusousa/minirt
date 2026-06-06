@@ -36,7 +36,7 @@ bool			skip(char **s, bool (*predicate)(char));
 bool			match_id(char **line, char *id);
 void			syntax_error(const char *file, int line, const char *start,
 					const char *c);
-int			parse_file(t_world *wrld, char *path);
+int				parse_file(t_world *wrld, char *path);
 t_parse_status	parse_double(char **line, double *d);
 t_parse_status	parse_vec3_double(char **line, t_vec3 *vec);
 t_parse_status	parse_nvec3_double(char **line, t_vec3 *vec);

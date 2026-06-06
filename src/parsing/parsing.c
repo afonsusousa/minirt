@@ -92,14 +92,13 @@ t_parse_status	parse_line(char **line, t_world *wrld)
 {
 	void			*target;
 	const t_format	*fmt;
+	t_parse_status	status;
 
 	skip(line, ft_isspace);
 	if (**line == '\0' || **line == '\n')
 		return (PARSE_OK);
 	if (match_object(line, wrld, &target, &fmt))
 	{
-		t_parse_status status;
-
 		status = parse_format(target, fmt, line);
 		if (status != PARSE_OK)
 			return (status);

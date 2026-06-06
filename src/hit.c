@@ -15,7 +15,7 @@
 void	set_face_normal(t_hit *record, t_ray *ray,
 		t_vec3 outward_normal)
 {
-	t_vec3 unit_normal;
+	t_vec3	unit_normal;
 
 	unit_normal = v3_unit(outward_normal);
 	record->front_face = v3_dot(&ray->direction, &unit_normal) < 0.0;

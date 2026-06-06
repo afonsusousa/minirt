@@ -72,7 +72,8 @@ void	syntax_error(const char *file, int line, const char *start,
 	int	len;
 
 	offset = c - start;
-	printf("%s:%d:%d: error: syntax error\n", file, line, offset + 1);
+	printf("Error\n");
+	printf("%s:%d:%d: syntax error\n", file, line, offset + 1);
 	printf("%s", start);
 	len = ft_strlen(start);
 	if (len == 0 || start[len - 1] != '\n')

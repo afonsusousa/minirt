@@ -17,6 +17,7 @@
 #include "../includes/ray.h"
 #include "../includes/render.h"
 #include "../includes/vec3.h"
+#include "../includes/world.h"
 #include "../lib/minilibx-linux/mlx.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,55 +79,6 @@ static void	setup_window(t_mlx_context *ctx, int width, int height)
 			&ctx->img.bits_per_pixel,
 			&ctx->img.line_length,
 			&ctx->img.endian);
-}
-
-static bool	destroy_world(t_world *wrld)
-{
-	if (!wrld)
-		return (true);
-	if (wrld->objects)
-	{
-		free(wrld->objects);
-		wrld->objects = NULL;
-	}
-	if (wrld->lights)
-	{
-		free(wrld->lights);
-		wrld->lights = NULL;
-	}
-	wrld->has_ambient = false;
-	return (true);
-}
-
-int	close_window(void *arg)
-{
-	t_mlx_context	*ctx;
-
-	ctx = (t_mlx_context *)arg;
-	if (!ctx)
-		exit(1);
-	if (ctx->mlx)
-		mlx_loop_hook(ctx->mlx, NULL, NULL);
-	if (ctx->mlx && ctx->mlx_win)
-	{
-		mlx_destroy_window(ctx->mlx, ctx->mlx_win);
-		ctx->mlx_win = NULL;
-	}
-	if (ctx->mlx && ctx->img.img_ptr)
-	{
-		mlx_destroy_image(ctx->mlx, ctx->img.img_ptr);
-		ctx->img.img_ptr = NULL;
-	}
-	if (ctx->mlx)
-		mlx_destroy_display(ctx->mlx);
-	if (ctx->mlx)
-		free(ctx->mlx);
-	if (ctx->w)
-	{
-		destroy_world(ctx->w);
-		ctx->w = NULL;
-	}
-	exit(0);
 }
 
 int	handle_input(int key, void *arg)

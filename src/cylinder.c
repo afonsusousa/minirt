@@ -22,6 +22,7 @@ static void	hit_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap,
 	t_vec3		normal;
 	t_hit		temp_rec;
 	t_hit_ctx	temp_ctx;
+	double		r;
 
 	if (bot_cap)
 		normal = v3_neg(cylinder->u_shape.s_cylinder.dir);
@@ -34,7 +35,7 @@ static void	hit_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap,
 	temp_ctx.record = &temp_rec;
 	if (!hit_plane_math(&temp_ctx, center, normal))
 		return ;
-	double r = cylinder->u_shape.s_cylinder.diameter / 2.0;
+	r = cylinder->u_shape.s_cylinder.diameter / 2.0;
 	if (v3_len_sq(v3_sub(temp_rec.p, center)) <= r * r)
 	{
 		*hit_anything = true;

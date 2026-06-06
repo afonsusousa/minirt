@@ -35,5 +35,6 @@ typedef struct s_mlx_context
 }	t_mlx_context;
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
+int		close_window(void *arg);
 
 #endif

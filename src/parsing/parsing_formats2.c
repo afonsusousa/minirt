@@ -22,5 +22,6 @@ const t_format	*get_light_fmt(void)
 	{F_COLOR, offsetof(t_light, color), "color"},
 	{F_END, 0, NULL}
 	};
+
 	return (fmt);
 }

@@ -20,6 +20,7 @@ const t_format	*get_sphere_fmt(void)
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};
+
 	return (fmt);
 }
 
@@ -31,6 +32,7 @@ const t_format	*get_plane_fmt(void)
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};
+
 	return (fmt);
 }
 
@@ -44,6 +46,7 @@ const t_format	*get_cylinder_fmt(void)
 	{F_COLOR, offsetof(t_obj, color), "color"},
 	{F_END, 0, NULL}
 	};
+
 	return (fmt);
 }
 
@@ -54,6 +57,7 @@ const t_format	*get_ambient_fmt(void)
 	{F_COLOR, offsetof(t_ambient, color), "color"},
 	{F_END, 0, NULL}
 	};
+
 	return (fmt);
 }
 
@@ -65,5 +69,6 @@ const t_format	*get_camera_fmt(void)
 	{F_DOUBLE, offsetof(t_camera, fov), "fov"},
 	{F_END, 0, NULL}
 	};
+
 	return (fmt);
 }

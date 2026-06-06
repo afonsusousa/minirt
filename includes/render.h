@@ -18,7 +18,8 @@
 # include "obj.h"
 
 # define SHININESS 64.0
-# define SPEC_INTENSITY 1.0
+# define SPEC_INTENSITY 0.25
+# define DIFFUSE_INTENSITY 0.8
 
 bool	get_closest_hit(t_ray *r, t_world *w, t_hit *rec, t_vec3 *color);
 t_vec3	phong_ray_color(t_ray *r, t_world *w);

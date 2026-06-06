@@ -25,18 +25,18 @@ t_vec3	calc_diffuse(t_phong_ctx *ctx, t_vec3 l_dir, size_t idx)
 
 	n_dot_l = fmax(0.0, v3_dot(&ctx->record->n, &l_dir));
 	return (v3_muls(v3_mul(ctx->obj_color, ctx->world->lights[idx].color),
-			ctx->world->lights[idx].ratio * n_dot_l));
+			ctx->world->lights[idx].ratio * DIFFUSE_INTENSITY * n_dot_l));
 }
 
 t_vec3	calc_specular(t_phong_ctx *ctx, t_vec3 l_dir, size_t idx)
 {
-	t_vec3	h_dir;
+	t_vec3	r_dir;
 	t_vec3	v_dir;
 	double	spec;
 
 	v_dir = v3_unit(v3_sub(ctx->ray->origin, ctx->record->p));
-	h_dir = v3_unit(v3_add(l_dir, v_dir));
-	spec = pow(fmax(0.0, v3_dot(&ctx->record->n, &h_dir)), SHININESS);
+	r_dir = v3_reflect(v3_neg(l_dir), ctx->record->n);
+	spec = pow(fmax(0.0, v3_dot(&v_dir, &r_dir)), SHININESS);
 	return (v3_muls(ctx->world->lights[idx].color,
 			ctx->world->lights[idx].ratio * SPEC_INTENSITY * spec));
 }
