@@ -34,7 +34,6 @@ void	v3_unit_mut(t_vec3 *dest)
 	dest->x /= length;
 	dest->y /= length;
 	dest->z /= length;
-	dest->w = 0.0;
 }
 
 int	v3_near_zero(t_vec3 vec)

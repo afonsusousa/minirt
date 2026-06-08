@@ -23,7 +23,6 @@ typedef union s_vec3
 		double			x;
 		double			y;
 		double			z;
-		double			w;
 	};
 	double				e[4];
 }						t_vec3;

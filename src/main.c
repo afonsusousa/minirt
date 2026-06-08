@@ -20,7 +20,6 @@
 #include "../includes/world.h"
 #include "../lib/minilibx-linux/mlx.h"
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "libft.h"
 #include "parsing.h"

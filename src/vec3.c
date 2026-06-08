@@ -19,7 +19,6 @@ t_vec3	vec3(double x, double y, double z)
 	res.x = x;
 	res.y = y;
 	res.z = z;
-	res.w = 0.0;
 	return (res);
 }
 
