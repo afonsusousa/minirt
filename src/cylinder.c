@@ -68,26 +68,33 @@ static bool	hit_tube(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc,
 	double	root;
 	double	proj;
 	t_vec3	p_minus_c;
+	t_vec3	p;
 
 	root = (-calc->half_b - sqrt_d) / calc->a;
 	if (surrounds(ctx->ray_t, root))
 	{
-		ctx->record->t = root;
-		ctx->record->p = ray_at(ctx->ray, root);
-		p_minus_c = v3_sub(ctx->record->p, cylinder->u_shape.s_cylinder.pos);
+		p = ray_at(ctx->ray, root);
+		p_minus_c = v3_sub(p, cylinder->u_shape.s_cylinder.pos);
 		proj = v3_dot(&p_minus_c, &cylinder->u_shape.s_cylinder.dir);
 		if (fabs(proj) <= cylinder->u_shape.s_cylinder.height / 2.0)
+		{
+			ctx->record->t = root;
+			ctx->record->p = p;
 			return (true);
+		}
 	}
 	root = (-calc->half_b + sqrt_d) / calc->a;
 	if (surrounds(ctx->ray_t, root))
 	{
-		ctx->record->t = root;
-		ctx->record->p = ray_at(ctx->ray, root);
-		p_minus_c = v3_sub(ctx->record->p, cylinder->u_shape.s_cylinder.pos);
+		p = ray_at(ctx->ray, root);
+		p_minus_c = v3_sub(p, cylinder->u_shape.s_cylinder.pos);
 		proj = v3_dot(&p_minus_c, &cylinder->u_shape.s_cylinder.dir);
 		if (fabs(proj) <= cylinder->u_shape.s_cylinder.height / 2.0)
+		{
+			ctx->record->t = root;
+			ctx->record->p = p;
 			return (true);
+		}
 	}
 	return (false);
 }
