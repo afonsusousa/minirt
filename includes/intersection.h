@@ -58,4 +58,8 @@ bool				hit_cylinder(t_obj *cylinder, t_hit_ctx *ctx);
 bool				hit_plane(t_obj *plane, t_hit_ctx *ctx);
 bool				hit_plane_math(t_hit_ctx *ctx, t_vec3 center,
 						t_vec3 normal);
+void				setup_quad(t_obj *cylinder, t_hit_ctx *ctx,
+						t_quad_calc *calc);
+bool				check_cylinder_root(t_obj *cylinder, t_hit_ctx *ctx,
+						double root);
 #endif // MINIRT_INTERSECTION_H

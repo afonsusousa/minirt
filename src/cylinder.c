@@ -44,58 +44,17 @@ static void	hit_cap(t_hit_ctx *ctx, t_obj *cylinder, bool bot_cap,
 	}
 }
 
-static void	setup_quad(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc)
-{
-	double	axis_dot_dir;
-	double	axis_dot_oc;
-
-	axis_dot_dir = v3_dot(&ctx->ray->direction,
-			&cylinder->u_shape.s_cylinder.dir);
-	axis_dot_oc = v3_dot(&calc->oc,
-			&cylinder->u_shape.s_cylinder.dir);
-	calc->a = v3_dot(&ctx->ray->direction, &ctx->ray->direction) - axis_dot_dir
-		* axis_dot_dir;
-	calc->half_b = v3_dot(&ctx->ray->direction, &calc->oc) - (axis_dot_dir
-			* axis_dot_oc);
-	calc->c = v3_dot(&calc->oc, &calc->oc) - axis_dot_oc * axis_dot_oc
-		- (cylinder->u_shape.s_cylinder.diameter / 2.0)
-		* (cylinder->u_shape.s_cylinder.diameter / 2.0);
-}
-
 static bool	hit_tube(t_obj *cylinder, t_hit_ctx *ctx, t_quad_calc *calc,
 		double sqrt_d)
 {
 	double	root;
-	double	proj;
-	t_vec3	p_minus_c;
-	t_vec3	p;
 
 	root = (-calc->half_b - sqrt_d) / calc->a;
-	if (surrounds(ctx->ray_t, root))
-	{
-		p = ray_at(ctx->ray, root);
-		p_minus_c = v3_sub(p, cylinder->u_shape.s_cylinder.pos);
-		proj = v3_dot(&p_minus_c, &cylinder->u_shape.s_cylinder.dir);
-		if (fabs(proj) <= cylinder->u_shape.s_cylinder.height / 2.0)
-		{
-			ctx->record->t = root;
-			ctx->record->p = p;
-			return (true);
-		}
-	}
+	if (check_cylinder_root(cylinder, ctx, root))
+		return (true);
 	root = (-calc->half_b + sqrt_d) / calc->a;
-	if (surrounds(ctx->ray_t, root))
-	{
-		p = ray_at(ctx->ray, root);
-		p_minus_c = v3_sub(p, cylinder->u_shape.s_cylinder.pos);
-		proj = v3_dot(&p_minus_c, &cylinder->u_shape.s_cylinder.dir);
-		if (fabs(proj) <= cylinder->u_shape.s_cylinder.height / 2.0)
-		{
-			ctx->record->t = root;
-			ctx->record->p = p;
-			return (true);
-		}
-	}
+	if (check_cylinder_root(cylinder, ctx, root))
+		return (true);
 	return (false);
 }
 

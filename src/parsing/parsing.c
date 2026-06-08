@@ -95,7 +95,7 @@ t_parse_status	parse_line(char **line, t_world *wrld)
 	t_parse_status	status;
 
 	skip(line, ft_isspace);
-	if (**line == '\0' || **line == '\n')
+	if (**line == '\0' || **line == '\n' || **line == '#')
 		return (PARSE_OK);
 	if (match_object(line, wrld, &target, &fmt))
 	{

@@ -14,6 +14,7 @@ SRCS := \
 	$(SRC_DIR)/phong_components.c \
 	$(SRC_DIR)/sphere.c \
 	$(SRC_DIR)/cylinder.c \
+	$(SRC_DIR)/cylinder_helpers.c \
 	$(SRC_DIR)/plane.c \
 	$(SRC_DIR)/hit.c \
 	$(SRC_DIR)/vec3.c \
@@ -43,6 +44,11 @@ LDFLAGS := -L$(LIBFT_DIR)
 CFLAGS += -MMD -MP
 
 all: $(NAME)
+
+debug: CFLAGS := -fPIE -Wall -Wextra -Werror -g -MMD -MP
+debug: $(NAME)
+
+makedebug: debug
 
 $(NAME): $(LIBFT) $(OBJS) $(MLX)
 	$(CC) $(CFLAGS) $(MLXFLAGS) -o $@ $(OBJS) $(LDFLAGS) -lft $(LDLIBS) $(MLX) -lm
