@@ -25,7 +25,7 @@ static size_t	count_lines(char *path, int *fd)
 	line_count = 0;
 	*fd = open(path, O_RDONLY);
 	if (*fd < 0)
-		return (printf("Error.\n%s: couldn't open file.\n", path) * 0);
+		return (printf("Error.\n%s: couldn't open file.\n", path) * 0 - 1);
 	line = get_next_line(*fd);
 	while (line)
 	{
@@ -40,8 +40,10 @@ static size_t	count_lines(char *path, int *fd)
 	return (line_count);
 }
 
-static bool	alloc_world(t_world *wrld, size_t line_count)
+static bool	alloc_world(t_world *wrld, int line_count)
 {
+	if (line_count < 0)
+		return (false);
 	wrld->objects = ft_calloc(line_count, sizeof(t_obj));
 	wrld->lights = ft_calloc(line_count, sizeof(t_light));
 	if (!wrld->objects || !wrld->lights)
@@ -53,10 +55,10 @@ static bool	alloc_world(t_world *wrld, size_t line_count)
 	return (true);
 }
 
-static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
+static bool	parse_and_pack_lines(t_world *wrld, int fd, int count,
 		char *path)
 {
-	size_t			i;
+	int				i;
 	char			*line;
 	char			*curr;
 	t_parse_status	status;
@@ -72,7 +74,7 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
 		if (status != PARSE_OK && status != PARSE_OK_COMMENT)
 		{
 			if (status == PARSE_NOT_NORMALIZED)
-				printf("%s:%zu: error: non-normalized vector\n", path, i + 1);
+				printf("%s:%d: error: non-normalized vector\n", path, i + 1);
 			else
 				syntax_error(path, i + 1, line, curr);
 			return (free(line), false);
@@ -86,7 +88,7 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
 int	parse_file(t_world *wrld, char *path)
 {
 	int		fd;
-	size_t	line_count;
+	int		line_count;
 
 	fd = -1;
 	line_count = count_lines(path, &fd);
