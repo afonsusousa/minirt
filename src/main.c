@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "libft.h"
 #include "parsing.h"
 
 static void	render_pixel(t_world *w, t_data *img, int px, int py)
@@ -101,8 +102,7 @@ int	main(int argc, char **argv)
 		printf("Usage: ./minirt <map.3d>\n");
 		return (1);
 	}
-	w.objects = NULL;
-	w.lights = NULL;
+	ft_memset(&w, 0, sizeof(t_world));
 	if (parse_file(&w, argv[1]))
 		return (destroy_world(&w));
 	ctx.w = &w;

@@ -26,7 +26,9 @@
 typedef enum e_parse_status
 {
 	PARSE_OK,
+	PARSE_OK_COMMENT,
 	PARSE_SYNTAX_ERROR,
+	PARSE_READ_ERROR,
 	PARSE_NOT_NORMALIZED
 }	t_parse_status;
 

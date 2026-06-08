@@ -10,28 +10,33 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <fcntl.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #include "parsing.h"
 
-static size_t	count_lines(char *path)
+static size_t	count_lines(char *path, int *fd)
 {
-	int		fd;
 	size_t	line_count;
 	char	*line;
+	char	*s_line;
 
 	line_count = 0;
-	fd = open(path, O_RDONLY);
-	if (fd < 0)
-		return (0);
-	line = get_next_line(fd);
+	*fd = open(path, O_RDONLY);
+	if (*fd < 0)
+		return (printf("Error.\n%s: couldn't open file.\n", path) * 0);
+	line = get_next_line(*fd);
 	while (line)
 	{
-		line_count++;
+		s_line = line;
+		skip(&line, ft_isspace);
+		line_count += (*line != '\n' && *line != '#');
+		line = s_line;
 		free(line);
-		line = get_next_line(fd);
+		line = get_next_line(*fd);
 	}
-	close(fd);
+	close(*fd);
 	return (line_count);
 }
 
@@ -60,19 +65,20 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, size_t count,
 	while (i < count)
 	{
 		line = get_next_line(fd);
+		if (!line)
+			break ;
 		curr = line;
 		status = parse_line(&curr, wrld);
-		if (status != PARSE_OK)
+		if (status != PARSE_OK && status != PARSE_OK_COMMENT)
 		{
 			if (status == PARSE_NOT_NORMALIZED)
 				printf("%s:%zu: error: non-normalized vector\n", path, i + 1);
 			else
 				syntax_error(path, i + 1, line, curr);
-			free(line);
-			return (false);
+			return (free(line), false);
 		}
 		free(line);
-		i++;
+		i += status != PARSE_OK_COMMENT;
 	}
 	return (true);
 }
@@ -82,17 +88,21 @@ int	parse_file(t_world *wrld, char *path)
 	int		fd;
 	size_t	line_count;
 
-	line_count = count_lines(path);
-	if (!line_count || !alloc_world(wrld, line_count))
+	fd = -1;
+	line_count = count_lines(path, &fd);
+	if (!line_count)
+		return (printf("Error.\n%s: world is empty.\n", path));
+	if (!alloc_world(wrld, line_count))
 		return (1);
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
-		return (1);
+		return (printf("Error.\n%s: couldn't open file.\n", path) * 0 + 1);
 	if (!parse_and_pack_lines(wrld, fd, line_count, path))
 	{
 		close(fd);
 		return (1);
 	}
-	close(fd);
+	if (fd >= 0)
+		close(fd);
 	return (0);
 }
