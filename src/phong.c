@@ -74,5 +74,5 @@ t_vec3	phong_ray_color(t_ray *r, t_world *w)
 		ctx = (t_phong_ctx){w, &rec, color, r};
 		return (calc_direct_light(&ctx));
 	}
-	return (v3_muls(w->ambient.color, w->ambient.ratio));
+	return (vec3(0, 0, 0));
 }
