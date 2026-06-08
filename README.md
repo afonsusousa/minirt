@@ -100,43 +100,43 @@ cy 50.0,0.0,20.6  0,0,1.0  14.2  21.42  10,0,255
 ## Project Structure
 
 ```
-miniRT/
-├── Makefile
-├── README.md
-├── includes/
-│   ├── camera.h
-│   ├── color.h
-│   ├── intersection.h
-│   ├── interval.h
-│   ├── mlx_mitm.h
-│   ├── obj.h
-│   ├── parsing.h
-│   ├── ray.h
-│   ├── render.h
-│   ├── vec3.h
-│   └── world.h
-├── lib/
-│   ├── libft/
-│   └── minilibx-linux/
-├── scenes/
-│   ├── room.rt
-│   └── shadows.rt
-└── src/
-    ├── main.c
-    ├── camera.c
-    ├── cylinder.c
-    ├── hit.c
-    ├── phong.c
-    ├── phong_components.c
-    ├── pixel.c
-    ├── plane.c
-    ├── sphere.c
-    ├── vec3.c
-    ├── vec3_2.c
-    ├── vec3_3.c
-    ├── vec3_4.c
-    ├── world.c
-    └── parsing/
+src
+├── camera.c
+├── cylinder.c
+├── cylinder_helpers.c
+├── hit.c
+├── main.c
+├── parsing
+│   ├── parsing.c
+│   ├── parsing_error.c
+│   ├── parsing_formats2.c
+│   ├── parsing_formats.c
+│   ├── parsing_helpers.c
+│   ├── parsing_init.c
+│   ├── parsing_primitives.c
+│   └── parsing_utils.c
+├── phong.c
+├── phong_components.c
+├── pixel.c
+├── plane.c
+├── sphere.c
+├── vec3_2.c
+├── vec3_3.c
+├── vec3_4.c
+├── vec3.c
+└── world.c
+includes
+├── camera.h
+├── color.h
+├── intersection.h
+├── interval.h
+├── mlx_mitm.h
+├── obj.h
+├── parsing.h
+├── ray.h
+├── render.h
+├── vec3.h
+└── world.h
 ```
 
 ---
