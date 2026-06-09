@@ -82,7 +82,7 @@ static bool	parse_and_pack_lines(t_world *wrld, int fd, int count,
 		free(line);
 		i += status != PARSE_OK_COMMENT;
 	}
-	return (wrld->has_camera && wrld->has_ambient);
+	return (wrld->has_camera);
 }
 
 int	parse_file(t_world *wrld, char *path)
@@ -101,10 +101,8 @@ int	parse_file(t_world *wrld, char *path)
 		return (printf("Error.\n%s: couldn't open file.\n", path) * 0 + 1);
 	if (parse_and_pack_lines(wrld, fd, line_count, path) == 0)
 	{
-		if (!wrld->has_ambient || !wrld->has_camera)
-			printf("Error.\nWorld has no%.*s%.*s%.*s.\n",
-				!wrld->has_camera * 7, " Camera",
-				(!wrld->has_camera && !wrld->has_ambient) * 4, " nor",
+		if (!wrld->has_camera)
+			printf("Error.\nWorld has no%.*s.\n",
 				!wrld->has_ambient * 14, " Ambient Light");
 		close(fd);
 		return (1);

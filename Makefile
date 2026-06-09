@@ -1,4 +1,4 @@
-CC := clang
+CC := cc
 CFLAGS := -fPIE -Wall -Wextra -Werror -O3 -march=native -ffast-math
 INCLUDES := -Iincludes -Ilib/libft -I./lib/minilibx-linux
 SRC_DIR := src
@@ -38,7 +38,7 @@ MLX = $(MLXDIR)/libmlx.a
 MLXFLAGS = -lXext -lX11
 MLXDIR = lib/minilibx-linux
 
-NAME := minirt
+NAME := miniRT
 
 LDFLAGS := -L$(LIBFT_DIR)
 CFLAGS += -MMD -MP

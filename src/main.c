@@ -105,7 +105,7 @@ int	main(int argc, char **argv)
 	if (parse_file(&w, argv[1]))
 		return (destroy_world(&w));
 	ctx.w = &w;
-	init_camera(&w.camera, 1920, 16.0 / 9.0);
+	init_camera(&w.camera, 1366, 16.0 / 9.0);
 	setup_window(&ctx, w.camera.image_width, w.camera.image_height);
 	mlx_hook(ctx.mlx_win, 2, 1L << 0, &handle_input, &ctx);
 	mlx_hook(ctx.mlx_win, 17, 1L << 0, &close_window, &ctx);

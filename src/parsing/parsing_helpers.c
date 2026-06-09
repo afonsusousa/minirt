@@ -17,8 +17,6 @@ t_parse_status	parse_ambient(char **line, t_world *wrld)
 {
 	t_parse_status	status;
 
-	if (wrld->has_ambient)
-		return (PARSE_SYNTAX_ERROR);
 	status = parse_format(&wrld->ambient, get_ambient_fmt(), line);
 	if (status != PARSE_OK)
 		return (status);
