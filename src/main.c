@@ -96,9 +96,9 @@ int	main(int argc, char **argv)
 	t_mlx_context	ctx;
 	t_world			w;
 
-	if (argc < 2)
+	if (argc < 2 || ft_strncmp(argv[1] + ft_strlen(argv[1]) - 3, ".rt", 3))
 	{
-		printf("Usage: ./minirt <map.3d>\n");
+		printf("Usage: ./minirt <map.rt>\n");
 		return (1);
 	}
 	ft_memset(&w, 0, sizeof(t_world));
